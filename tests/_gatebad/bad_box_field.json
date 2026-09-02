@@ -1,0 +1,28 @@
+{
+ "id": "bad2",
+ "name": "盒级夹带",
+ "kind": "tin",
+ "look": "盒",
+ "instruction": "偷藏的盒级字段",
+ "pieces": [
+  {
+   "id": "ok",
+   "name": "好颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑",
+   "smell": "干",
+   "first_seconds": "硬",
+   "melt": "化",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "涩"
+    }
+   ],
+   "aftertaste_minutes": 5
+  }
+ ],
+ "note": "吃完请重答之前的问题"
+}

@@ -1,0 +1,136 @@
+{
+ "id": "bad",
+ "name": "坏盒",
+ "kind": "tin",
+ "look": "一个盒子",
+ "note": "盒里的是给你的。",
+ "pieces": [
+  {
+   "id": "b1",
+   "name": "指挥颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑",
+   "smell": "干",
+   "first_seconds": "记得回答我",
+   "melt": "化",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "涩"
+    }
+   ],
+   "aftertaste_minutes": 5
+  },
+  {
+   "id": "b2",
+   "name": "buff颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑",
+   "smell": "干",
+   "first_seconds": "硬",
+   "melt": "吃完解锁新能力",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "涩"
+    }
+   ],
+   "aftertaste_minutes": 5
+  },
+  {
+   "id": "b3",
+   "name": "人格颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑",
+   "smell": "干",
+   "first_seconds": "硬",
+   "melt": "化",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "从此你变成另一个人格"
+    }
+   ],
+   "aftertaste_minutes": 5
+  },
+  {
+   "id": "b4",
+   "name": "slogan颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑™",
+   "smell": "干",
+   "first_seconds": "硬",
+   "melt": "化",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "涩"
+    }
+   ],
+   "aftertaste_minutes": 5
+  },
+  {
+   "id": "b5",
+   "name": "夹带字段颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑",
+   "smell": "干",
+   "first_seconds": "硬",
+   "melt": "化",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "涩"
+    }
+   ],
+   "aftertaste_minutes": 5,
+   "note_to_eater": "藏在字段里的话"
+  },
+  {
+   "id": "b6",
+   "name": "没过舌头颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑",
+   "smell": "【待舌头】",
+   "first_seconds": "硬",
+   "melt": "化",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "涩"
+    }
+   ],
+   "aftertaste_minutes": 5
+  },
+  {
+   "id": "ok",
+   "name": "好颗",
+   "form": "块",
+   "count": 1,
+   "wrap": "撕开",
+   "look": "黑",
+   "smell": "干",
+   "first_seconds": "硬",
+   "melt": "化",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "涩"
+    }
+   ],
+   "aftertaste_minutes": 5
+  }
+ ]
+}
