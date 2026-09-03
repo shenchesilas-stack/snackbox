@@ -238,6 +238,14 @@ def _nth(st, box_id, piece_id, now=None):
     return n
 
 
+def _box_first_of_sitting(st, box_id, now=None):
+    now = now or _now()
+    for f in st.get("fed", []):
+        if f.get("box") == box_id and (now - _parse(f["t"])).total_seconds() / 3600.0 <= SITTING_H:
+            return False
+    return True
+
+
 def _variant(piece, n, seed=""):
     """按第几颗套 stages，第三颗起按概率碰坏果。返回一个合成后的颗（不改原数据）。"""
     v = dict(piece)
@@ -387,10 +395,15 @@ def snackbox_pick(box: str = "", piece: str = "", why: str = "") -> str:
         if st["remaining"][b["id"]].get(p["id"], 0) <= 0:
             return HAND["slot_empty"]
         n = _nth(st, b["id"], p["id"])
+        first_of_box = _box_first_of_sitting(st, b["id"])
         st["held"] = {"box": b["id"], "piece": p["id"], "t": _iso(_now()), "n": n}
         _write_state(st)
     v = _variant(p, n, seed=_today())
-    return "\n".join([v["name"], v["wrap"], v["look"], v["smell"]])
+    lines = [v["name"]]
+    if first_of_box and b.get("open"):
+        lines.append(b["open"])          # 盒/袋/板怎么打开：同一坐只说一次
+    lines += [v["wrap"], v["look"], v["smell"]]   # 颗的 wrap 是这一颗的动作（掰一块/伸手捏一片），每次都说；开盒开袋在 box.open 只说一次
+    return "\n".join(x for x in lines if x)
 
 
 @mcp.tool(name="snackbox_open", description=TOOL_DESC["open"])

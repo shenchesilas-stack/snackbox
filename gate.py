@@ -60,7 +60,7 @@ PIECE_FIELDS = {"id", "name", "form", "cocoa", "count", "tray", "wrap", "look", 
 VARIANT_FIELDS = {"wrap", "look", "smell", "first_seconds", "melt", "aftertaste"}
 PIECE_REQUIRED = {"id", "name", "form", "count", "wrap", "look", "smell", "first_seconds", "melt",
                   "aftertaste", "aftertaste_minutes"}
-BOX_FIELDS = {"id", "name", "kind", "look", "note", "pieces", "status"}   # status: "draft" = 写完了但她还没校正，不上桌
+BOX_FIELDS = {"id", "name", "kind", "look", "note", "pieces", "status", "open"}   # open: 盒/袋/板怎么打开，同一坐只说一次   # status: "draft" = 写完了但她还没校正，不上桌
 BOX_REQUIRED = {"id", "name", "kind", "look", "pieces"}
 
 
@@ -156,7 +156,7 @@ def check_box(box, serving=False):
     missing = BOX_REQUIRED - set(box)
     if missing:
         box_probs.append("盒缺字段: %s" % ",".join(sorted(missing)))
-    for k in ("name", "look"):
+    for k in ("name", "look", "open"):
         for cat, frag in check_text(box.get(k, ""), serving=serving):
             box_probs.append("盒 %s: %s「%s」" % (k, cat, frag))
     if "note" in box:
