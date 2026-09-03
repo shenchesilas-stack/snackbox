@@ -25,7 +25,11 @@ SCENE = {
            "that folded top edge between thumb and forefinger because the bag is hot. Down inside: glossy dark mahogany roasted "
            "chestnuts, several split open along a cut, a pale fuzzy patch at each base, a few sugar-glazed shiny spots; NO peeled "
            "nut. White steam drifting up out of the slit toward the viewer. Around the bag: an evening street blurred beyond "
-           "recognition, only soft warm bokeh and vague shapes, no readable objects. Details: ",    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
+           "recognition, only soft warm bokeh and vague shapes, no readable objects. Details: ",    "chips": "A foil chip bag torn open across the top, the tear ragged and off to one side, the bag slumped and half-deflated, "
+             "lying on the wood with a small heap of potato chips spilled out of the mouth; a few chips scattered closer to the camera, "
+             "one broken. The bag is plain and unprinted (a solid color, no logo, no text). Salt crystals and oil sheen visible on the "
+             "chips; a few crumbs on the wood. Details: ",
+    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
            "near-black brown with a restrained sheen and a faint grey fat bloom on the broken edge. A few crumbs.",
@@ -42,6 +46,8 @@ SCENE = {
 
 def build(box, piece, all_pieces):
     kind = box["kind"]
+    if box.get("category") == "chips":
+        kind = "chips"
     if kind == "bag":
         style = STYLE.replace("No hands, ", "").replace("Surface: dark walnut wood table, a little worn. ", "").replace(
             "Camera pulled back so the subject occupies roughly a third of the frame, ", "Close shot from above, the bag mouth fills most of the frame, ")
@@ -65,6 +71,7 @@ def main():
     a = ap.parse_args()
     cat, _, bid = a.box.partition("/") if "/" in a.box else ("chocolate", "/", a.box)   # 用法：gen_images.py chestnut/1_bag
     box = json.load(open(os.path.join(ROOT, "data", cat, bid + ".json"), encoding="utf-8"))
+    box["category"] = cat
     out_dir = os.path.join(ROOT, "assets", cat, box["id"])
     os.makedirs(out_dir, exist_ok=True)
     only = set(x for x in a.only.split(",") if x)
