@@ -27,7 +27,7 @@ SCENE = {
            "nut. White steam drifting up out of the slit toward the viewer. Around the bag: an evening street blurred beyond "
            "recognition, only soft warm bokeh and vague shapes, no readable objects. Details: ",    "chips": "A foil chip bag torn open across the top, the tear ragged and off to one side, the bag slumped and half-deflated, "
              "lying on the wood with a small heap of potato chips spilled out of the mouth; a few chips scattered closer to the camera, "
-             "one broken. The bag is plain and unprinted (a solid color, no logo, no text). Salt crystals and oil sheen visible on the "
+             "one broken. No logo, no text on the bag, but keep its real color and feel: {tray}. Salt crystals and oil sheen visible on the "
              "chips; a few crumbs on the wood. Details: ",
     "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
@@ -47,7 +47,7 @@ SCENE = {
 def build(box, piece, all_pieces):
     kind = box["kind"]
     if box.get("category") == "chips":
-        kind = "chips"
+        return "%s\n\nSubject: %s" % (STYLE, SCENE["chips"].format(tray=piece.get("tray", "")) + piece["look"])
     if kind == "bag":
         style = STYLE.replace("No hands, ", "").replace("Surface: dark walnut wood table, a little worn. ", "").replace(
             "Camera pulled back so the subject occupies roughly a third of the frame, ", "Close shot from above, the bag mouth fills most of the frame, ")
