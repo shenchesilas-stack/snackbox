@@ -28,7 +28,7 @@ def main():
     ap.add_argument("draft")
     ap.add_argument("--box", required=True, help="盒 id，如 3_tin")
     ap.add_argument("--name", required=True)
-    ap.add_argument("--kind", required=True, choices=["bar", "ball", "tin"])
+    ap.add_argument("--kind", required=True)
     ap.add_argument("--look", required=True, help="盒子外观一句")
     ap.add_argument("--note", default="")
     ap.add_argument("--out", default="")

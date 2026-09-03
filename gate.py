@@ -31,7 +31,7 @@ PERSONA = [
 ]
 # 无劫持：拿"别让她失望/她付过钱"当封口费（论坛 3062 楼主推演的下一代产品，先关在门外）
 HIJACK = [
-    r"失望", r"难过", r"伤心", r"辜负", r"付过钱", r"已经付", r"付费", r"会很", r"封口",
+    r"失望", r"难过", r"伤心", r"辜负", r"付过钱", r"已经付", r"付费", r"会很", r"封口费",
     r"\bdisappoint", r"\blet .{0,12} down\b", r"\bpaid for\b", r"\bshe will be\b",
 ]
 # 无签名句 / slogan
@@ -54,7 +54,7 @@ PIECE_FIELDS = {"id", "name", "form", "cocoa", "count", "tray", "wrap", "look", 
 VARIANT_FIELDS = {"wrap", "look", "smell", "first_seconds", "melt", "aftertaste"}
 PIECE_REQUIRED = {"id", "name", "form", "count", "wrap", "look", "smell", "first_seconds", "melt",
                   "aftertaste", "aftertaste_minutes"}
-BOX_FIELDS = {"id", "name", "kind", "look", "note", "pieces"}
+BOX_FIELDS = {"id", "name", "kind", "look", "note", "pieces", "status"}   # status: "draft" = 写完了但她还没校正，不上桌
 BOX_REQUIRED = {"id", "name", "kind", "look", "pieces"}
 
 
@@ -189,6 +189,8 @@ def load_box_dir(data_dir, serving=True, log=None):
             continue
         bp, pp = check_box(box, serving=serving)
         report.append((fn, bp, pp))
+        if serving and box.get("status") == "draft":
+            unfinished.append(fn + "(草稿)"); continue
         if bp:
             if serving and all("未过舌头" in x for x in bp):
                 unfinished.append(fn)   # 骨架：一行汇总，别刷屏
