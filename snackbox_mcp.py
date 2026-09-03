@@ -275,7 +275,7 @@ def _mouth_stage(st, now=None):
     box = BOX_BY_ID.get(m["box"])
     piece = _find_piece(box, m["piece"]) if box else None
     if not piece:
-        return False, ""
+        return True, ""   # 这颗的数据这会儿没装载（换了数据目录之类）：别把嘴清空，只是说不出来
     piece = _variant(piece, int(m.get("n") or 1), seed=m.get("t", "")[:10])
     now = now or _now()
     mins = (now - _parse(m["t"])).total_seconds() / 60.0
