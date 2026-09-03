@@ -44,8 +44,8 @@ SCENE = {
 
 
 CHIPS_HINT = {   # 让两袋黄的分得开（只管图，不改文字）
-    "plain": "Bag color: deep yellow with a wide RED band across the middle and a simple potato and chip illustration.",
-    "butter": "Bag color: pale cream-yellow, with a big golden butter block and a thick honey drizzle painted large on the front.",
+    "plain": "Bag color: yellow on the upper part with a simple potato and a few chips illustrated near the top, and a wide RED band across the BOTTOM third of the bag.",
+    "butter": "Bag color: pale cream-yellow; on the front a SMALL pat of butter (about the size of a thumb, much smaller than the chips) with a thin ribbon of honey drizzling onto a few chips; the illustration modest, not filling the bag.",
     "maui_onion": "Bag: printed all over with palm trees, a big wave and a surfing onion cartoon, teal and orange.",
 }
 
