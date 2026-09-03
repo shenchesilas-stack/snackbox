@@ -18,7 +18,7 @@ STYLE = ("mouth-watering editorial food photography, rich, warm, slightly moody.
 
 SCENE = {
     "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
-           "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin foil folded back with crinkles catching the light. One rectangle has "
+           "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
            "near-black brown with a restrained sheen and a faint grey fat bloom on the broken edge. A few crumbs.",
     "ball": "A small open paper bag of milk chocolate soft-centre balls, each in plain unprinted red foil twisted at "
@@ -28,7 +28,7 @@ SCENE = {
     "tin": "An open square tin of assorted chocolates, lid off, translucent tissue paper lifted back, a twelve-cell "
            "tray in which every piece is different: {tray_list}. Exactly ONE cell is empty: the cell of THIS piece. "
            "In front of the tin on the wood: THIS piece, taken out and broken in half, break edge toward the camera: "
-           "{this}.",
+           "{this}. If the piece is described as dark chocolate, its shell must be dark near-black brown, not milk; if salt crystals are described, coarse white salt grains must be visible on top.",
 }
 
 
