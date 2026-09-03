@@ -1,0 +1,261 @@
+{
+ "id": "2_popsicle",
+ "name": "冰棍",
+ "kind": "stick",
+ "look": "【待舌头】",
+ "pieces": [
+  {
+   "id": "p01",
+   "name": "【待舌头】 第1种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p02",
+   "name": "【待舌头】 第2种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p03",
+   "name": "【待舌头】 第3种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p04",
+   "name": "【待舌头】 第4种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p05",
+   "name": "【待舌头】 第5种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p06",
+   "name": "【待舌头】 第6种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p07",
+   "name": "【待舌头】 第7种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p08",
+   "name": "【待舌头】 第8种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p09",
+   "name": "【待舌头】 第9种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p10",
+   "name": "【待舌头】 第10种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p11",
+   "name": "【待舌头】 第11种",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  }
+ ]
+}

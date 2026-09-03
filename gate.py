@@ -222,7 +222,7 @@ def load_categories(data_root, serving=True, log=None):
         cj = os.path.join(full, "category.json")
         if os.path.isfile(cj):
             try:
-                cat.update({k: v for k, v in json.load(open(cj, encoding="utf-8")).items() if k in ("name", "emoji", "look", "load")})
+                cat.update({k: v for k, v in json.load(open(cj, encoding="utf-8")).items() if k in ("name", "emoji", "look", "load", "order")})
             except Exception as e:
                 log("[gate] %s/category.json 读不出来: %s" % (d, e))
         for k in ("name", "look"):
@@ -240,6 +240,7 @@ def load_categories(data_root, serving=True, log=None):
             b["category"] = d
         if boxes:
             out.append((cat, boxes))
+    out.sort(key=lambda cb: (float(cb[0].get("order", 999)), cb[0]["id"]))
     return out
 
 

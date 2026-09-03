@@ -1,0 +1,31 @@
+{
+ "id": "1_one",
+ "name": "一个",
+ "kind": "fruit",
+ "look": "【待舌头】",
+ "pieces": [
+  {
+   "id": "p01",
+   "name": "桃",
+   "form": "【待舌头】",
+   "count": 1,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  }
+ ]
+}

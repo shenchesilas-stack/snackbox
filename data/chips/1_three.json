@@ -1,0 +1,77 @@
+{
+ "id": "1_three",
+ "name": "三袋",
+ "kind": "bag",
+ "look": "【待舌头】",
+ "pieces": [
+  {
+   "id": "p01",
+   "name": "原味",
+   "form": "【待舌头】",
+   "count": 20,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p02",
+   "name": "黄油",
+   "form": "【待舌头】",
+   "count": 20,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  },
+  {
+   "id": "p03",
+   "name": "夏威夷洋葱",
+   "form": "【待舌头】",
+   "count": 20,
+   "tray": "【待舌头】",
+   "wrap": "【待舌头】",
+   "look": "【待舌头】",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】",
+   "aftertaste": [
+    {
+     "at_min": 0,
+     "text": "【待舌头】"
+    },
+    {
+     "at_min": 3,
+     "text": "【待舌头】"
+    }
+   ],
+   "aftertaste_minutes": 6
+  }
+ ]
+}
