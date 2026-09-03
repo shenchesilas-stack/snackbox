@@ -82,8 +82,10 @@ assert [b["id"] for b in sb2.BOXES] == ["1_bag"]
 t1 = sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o1 = sb2.snackbox_open()[0]
 assert "第一颗一定烫" in o1, o1
 t2 = sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o2 = sb2.snackbox_open()[0]
-assert "第二颗最好吃" in o2, o2
-for _ in range(2): sb2.snackbox_pick("糖炒毛栗子", "chestnut"); sb2.snackbox_open()
+assert "第二颗最好吃" in o2 and "白霜" not in o2 and "发酸" not in o2, o2   # 肚子话不再是巧克力的词
+sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o3 = sb2.snackbox_open()[0]
+assert "第二颗" not in o3 and "学会剥开了" in o3, o3
+sb2.snackbox_pick("糖炒毛栗子", "chestnut"); sb2.snackbox_open()
 t4 = sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o4 = sb2.snackbox_open()[0]
 assert ("手指已经黑了" in t4 or "坏的" in t4) and ("较劲" in o4 or "苦" in o4), (t4, o4)
 tick(60 * 3)   # 三小时后另一坐，重新从第一颗算

@@ -116,11 +116,11 @@ def check_piece(piece, serving=False):
         if k in piece:
             for cat, frag in check_text(piece[k], serving=serving):
                 probs.append("%s: %s「%s」" % (k, cat, frag))
-    for key, need in (("stages", "from"), ("duds", "p")):
+    for key, need in (("stages", ("from", "at")), ("duds", ("p",))):
         for i, v in enumerate(piece.get(key) or []):
-            if not isinstance(v, dict) or need not in v:
-                probs.append("%s[%d] 缺 %s" % (key, i, need)); continue
-            extra = set(v) - VARIANT_FIELDS - {need}
+            if not isinstance(v, dict) or not any(k in v for k in need):
+                probs.append("%s[%d] 缺 %s" % (key, i, "/".join(need))); continue
+            extra = set(v) - VARIANT_FIELDS - set(need)
             if extra:
                 probs.append("%s[%d] 多出字段: %s" % (key, i, ",".join(sorted(extra))))
             for k, t in v.items():
@@ -222,12 +222,19 @@ def load_categories(data_root, serving=True, log=None):
         cj = os.path.join(full, "category.json")
         if os.path.isfile(cj):
             try:
-                cat.update({k: v for k, v in json.load(open(cj, encoding="utf-8")).items() if k in ("name", "emoji", "look")})
+                cat.update({k: v for k, v in json.load(open(cj, encoding="utf-8")).items() if k in ("name", "emoji", "look", "load")})
             except Exception as e:
                 log("[gate] %s/category.json 读不出来: %s" % (d, e))
         for k in ("name", "look"):
             for c, frag in check_text(cat.get(k, "")):
                 log("[gate] 门类 %s %s 不过关: %s「%s」" % (d, k, c, frag)); cat[k] = ""
+        if "load" in cat:   # 门类自己的肚子话：[[下限, 话], …]；不过关的整表丢掉
+            ok = isinstance(cat["load"], list) and all(isinstance(x, list) and len(x) == 2 for x in cat["load"])
+            bad = [] if ok else ["格式"]
+            for x in (cat["load"] if ok else []):
+                bad += [c for c, _ in check_text(x[1], allow_you=True)]
+            if bad:
+                log("[gate] 门类 %s load 表不过关: %s，丢掉" % (d, bad)); cat.pop("load", None)
         boxes, _ = load_box_dir(full, serving=serving, log=log)
         for b in boxes:
             b["category"] = d

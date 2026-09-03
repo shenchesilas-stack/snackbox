@@ -80,11 +80,11 @@ HAND = {
     "kept_empty": "什么都没留过。",
     "kept_nothing_to_keep": "空的，没留。",
 }
-LOAD_TABLE = [  # (load 下限, 手加的一行)；她调数字
-    (12, "一盒下肚了。今晚肚子会疼，明早还沉。"),
+LOAD_TABLE = [  # 通用默认（门类可在 category.json 的 load 里自带一套，巧克力那套在 data/chocolate/category.json）
+    (12, "吃太多了。今晚肚子会难受，明早还沉。"),
     (7, "肚子不舒服了，不太想要下一颗。手照递。"),
-    (4, "嘴里糊住了，甜的后味开始发酸，肚子开始沉。"),
-    (2, "甜的开始腻，苦的开始麻，白霜那层尝不太出了。"),
+    (4, "嘴里糊住了，肚子开始沉。"),
+    (2, "开始腻了。"),
     (1, "舌头还认得每一层。"),
 ]
 
@@ -101,6 +101,10 @@ mcp = FastMCP("snackbox", instructions=INSTRUCTIONS,
 CATEGORIES = gate.load_categories(DATA, serving=True)   # [(门类, 盒列表)]
 BOXES = [b for _, bs in CATEGORIES for b in bs]
 BOX_BY_ID = {b["id"]: b for b in BOXES}
+CAT_BY_ID = {cat["id"]: cat for cat, _ in CATEGORIES}
+_bad_cat = gate.check_strings({"load_default": [t for _, t in LOAD_TABLE]}, allow_you=True)
+if _bad_cat:
+    sys.stderr.write("[gate] 默认肚子话不过关: %s\n" % json.dumps(_bad_cat, ensure_ascii=False)); sys.exit(3)
 
 
 def _now():
@@ -195,10 +199,20 @@ def _load(st, now=None):
     return total
 
 
-def _load_line(st, now=None, floor_min=0):
+def _load_table_for(box):
+    cat = CAT_BY_ID.get((box or {}).get("category", ""), {})
+    if "load" in cat:
+        return sorted(((float(a), b) for a, b in cat["load"]), key=lambda x: -x[0])
+    return LOAD_TABLE
+
+
+def _load_line(st, now=None, floor_min=0, box=None):
     load = _load(st, now)
-    for floor, line in LOAD_TABLE:
-        if load >= floor and floor >= floor_min:
+    if box is None:
+        last = (st.get("fed") or [None])[-1]
+        box = BOX_BY_ID.get(last["box"]) if last else None
+    for floor, line in _load_table_for(box):
+        if load >= floor and floor >= floor_min and line:
             return line
     return ""
 
@@ -227,9 +241,10 @@ def _nth(st, box_id, piece_id, now=None):
 def _variant(piece, n, seed=""):
     """按第几颗套 stages，第三颗起按概率碰坏果。返回一个合成后的颗（不改原数据）。"""
     v = dict(piece)
-    for stg in sorted(piece.get("stages") or [], key=lambda x: x.get("from", 1)):
-        if n >= int(stg.get("from", 1)):
-            v.update({k: val for k, val in stg.items() if k != "from"})
+    for stg in sorted(piece.get("stages") or [], key=lambda x: x.get("from", x.get("at", 1))):
+        hit = (n == int(stg["at"])) if "at" in stg else (n >= int(stg.get("from", 1)))
+        if hit:
+            v.update({k: val for k, val in stg.items() if k not in ("from", "at")})
     if n >= 3 and piece.get("duds"):
         import hashlib
         h = int(hashlib.sha1(("%s|%s|%d" % (seed, piece["id"], n)).encode()).hexdigest()[:8], 16) / 0xFFFFFFFF
@@ -399,7 +414,7 @@ def snackbox_open() -> list:
         st["mouth"] = {"box": b["id"], "piece": p["id"], "t": _iso(now), "n": n}
         st["held"] = None
         _write_state(st)
-        load_line = _load_line(st, now)
+        load_line = _load_line(st, now, box=b)
     v = _variant(p, n, seed=_today())
     lines = []
     if overlap:
