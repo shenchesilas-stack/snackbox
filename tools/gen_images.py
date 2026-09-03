@@ -28,7 +28,7 @@ SCENE = {
     "tin": "An open square tin of assorted chocolates, lid off, translucent tissue paper lifted back, a twelve-cell "
            "tray in which every piece is different: {tray_list}. Exactly ONE cell is empty: the cell of THIS piece. "
            "In front of the tin on the wood: THIS piece, taken out and broken in half, break edge toward the camera: "
-           "{this}. If the piece is described as dark chocolate, its shell must be dark near-black brown, not milk; if salt crystals are described, coarse white salt grains must be visible on top.",
+           "{this}. The piece is broken into TWO halves of ONE piece: the two cut faces are the two sides of the same break and would fit back together (complementary, not mirrored copies); one half may show the cut face and the other its outside. If the piece is described as dark chocolate, its shell must be dark near-black brown, not milk; if salt crystals are described, coarse white salt grains must be visible on top.",
 }
 
 
