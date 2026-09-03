@@ -176,7 +176,7 @@ def load_box_dir(data_dir, serving=True, log=None):
     """读目录下所有 *.json 盒。返回 (可上架的盒列表, 报告)。
     serving=True：不过的颗剔掉、盒级问题整盒剔掉（缺一颗，不上一颗坏的）。"""
     log = log or (lambda s: print(s, file=sys.stderr))
-    boxes, report = [], []
+    boxes, report, unfinished = [], [], []
     for fn in sorted(os.listdir(data_dir)) if os.path.isdir(data_dir) else []:
         if not fn.endswith(".json") or fn == "category.json":
             continue
@@ -190,7 +190,10 @@ def load_box_dir(data_dir, serving=True, log=None):
         bp, pp = check_box(box, serving=serving)
         report.append((fn, bp, pp))
         if bp:
-            log("[gate] %s 整盒拒载: %s" % (fn, "; ".join(bp)))
+            if serving and all("未过舌头" in x for x in bp):
+                unfinished.append(fn)   # 骨架：一行汇总，别刷屏
+            else:
+                log("[gate] %s 整盒拒载: %s" % (fn, "; ".join(bp)))
             continue
         kept = [p for p in box["pieces"] if p.get("id") not in pp]
         for pid, probs in pp.items():
@@ -200,6 +203,8 @@ def load_box_dir(data_dir, serving=True, log=None):
             continue
         box = dict(box, pieces=kept)
         boxes.append(box)
+    if unfinished:
+        log("[gate] %s: %d 盒还在等舌头，没上桌（%s）" % (os.path.basename(data_dir), len(unfinished), ", ".join(unfinished)))
     return boxes, report
 
 
