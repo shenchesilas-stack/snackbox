@@ -17,10 +17,13 @@ STYLE = ("mouth-watering editorial food photography, rich, warm, slightly moody.
          "and glossy but hold their shape; a bar square only just softens at one corner.")
 
 SCENE = {
-    "bag": "A brown paper bag of freshly roasted chestnuts, the top folded open, a few chestnuts spilled onto the wood, "
-           "glossy dark-brown shells with a lighter fuzzy base, some split open from the heat; in front, one chestnut peeled: "
-           "the shell cracked in two beside it, the thin papery inner skin half torn away, the pale golden nutmeat exposed, "
-           "a wisp of steam. Details: ",
+    "bag": "A brown paper bag of freshly roasted chestnuts (Chinese sugar-roasted chestnuts), the top folded open, a few "
+           "chestnuts spilled onto the wood: glossy dark mahogany shells, each with a pale rough fuzzy patch at the base, "
+           "several split open along a cut on the rounded side. In front, one chestnut peeled, photographed accurately like a "
+           "real Chinese chestnut, NOT a stylized dessert: the nutmeat is pale butter-yellow, kidney-shaped, one side flat and "
+           "one side rounded, MATTE surface with shallow irregular wrinkles and a faint seam where it would split into two lobes, "
+           "NO radial ridges, NO glossy dome; a few scraps of the thin papery brown inner skin still clinging to it; the two "
+           "halves of its dark shell lying beside it, the inside of the shell pale and papery; a faint wisp of steam. Details: ",
     "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
