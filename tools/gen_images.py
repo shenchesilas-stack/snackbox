@@ -17,13 +17,14 @@ STYLE = ("mouth-watering editorial food photography, rich, warm, slightly moody.
          "and glossy but hold their shape; a bar square only just softens at one corner.")
 
 SCENE = {
-    "bag": "HAND-HELD, not on a table: a person's hand holds a brown paper bag of freshly roasted Chinese sugar-roasted "
-           "chestnuts by pinching only the folded top corner between fingertips, because the bag is too hot to hold properly; "
-           "the bag is open and full of glossy dark mahogany chestnuts, many split open along a cut, a pale rough fuzzy patch "
-           "at each base, a few sugar-glazed spots; visible white steam rising out of the bag into the cool air. Background: an "
-           "evening street scene blurred beyond recognition, extremely shallow depth of field, only soft warm bokeh of lights and "
-           "vague shapes, no readable objects, no stall, no wok. "
-           "The hand looks natural and anatomically correct, five fingers, only fingertips touching the paper. Details: ",    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
+    "bag": "First-person point of view, eyes looking DOWN into a bag held just below the chin: a thin, flimsy, ordinary brown "
+           "kraft paper bag from a street chestnut stall, lightweight and slightly crumpled, a little translucent with faint grease "
+           "spots, its top loosely gathered so the opening is a narrow irregular mouth (NOT a wide bowl, NOT a sturdy shopping bag). "
+           "A hand wearing a knitted wool glove pinches the gathered top edge between thumb and forefinger, because the bag is hot. "
+           "Down inside the bag: glossy dark mahogany roasted chestnuts piled at the bottom, several split open along a cut, a pale "
+           "fuzzy patch at each base, a few sugar-glazed shiny spots. Visible white steam drifting up out of the mouth toward the "
+           "viewer. Background around the bag: an evening street blurred beyond recognition, only soft warm bokeh and vague shapes, "
+           "no readable objects. Details: ",    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
            "near-black brown with a restrained sheen and a faint grey fat bloom on the broken edge. A few crumbs.",
@@ -42,7 +43,7 @@ def build(box, piece, all_pieces):
     kind = box["kind"]
     if kind == "bag":
         style = STYLE.replace("No hands, ", "").replace("Surface: dark walnut wood table, a little worn. ", "").replace(
-            "Camera pulled back so the subject occupies roughly a third of the frame, ", "Medium close shot, the bag and the hand fill about half the frame, ")
+            "Camera pulled back so the subject occupies roughly a third of the frame, ", "Close shot from above, the bag mouth fills most of the frame, ")
         return "%s\n\nSubject: %s%s" % (style, SCENE["bag"], piece["look"])
     if kind == "tin":
         others = [p["tray"] for p in all_pieces if p["id"] != piece["id"]]
