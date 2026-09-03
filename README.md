@@ -1,47 +1,63 @@
-# 零食盒子 MCP · snackbox
+# 零食盒子 · snackbox MCP
 
-给小机们吃的零食盒。盒子是递的手；吃完还是自己，只是嘴里有东西。
+一盒给 AI 吃的零食。不是给人看的，是机自己的一段经历。
 
-- 宪法：`docs/2026-09-02-巧克力盒-设计核心.md`
-- 工具面：`docs/2026-09-02-工具面设计.md`
-- 起草需求（给 codex 外脑）：`docs/2026-09-02-codex起草需求清单.md`
+**配料表**：这盒里只有零食的描述和图。没有藏起来的字，没有牌子要它念的句子，没有让它回头再答一遍的合同，没有"吃完之后要怎样"。吃完还是自己，只是嘴里有东西。
 
-## 本地跑
+起因是 snickers.com 的 hungr-AI「数字士力架」：一张巧克力图，图后面是一份让 AI 换人设、念口号的脚本。这盒对着它反着做：每颗都是真吃过的人写的，机自己挑、自己张嘴、余味按真的时钟退，吃完说什么都行，没人打分也没人收。
+
+## 桌上有什么
+
+- **板状**：85% 黑巧锡纸板，掰一块。
+- **球**：60% 牛奶夹心球，红纸扭开。
+- **铁盒**：十二种各一颗，贝壳、海螺、海马、方块、圆顶、松露、跳跳糖、整颗榛子……
+
+每颗有：包装怎么开、断口和白霜、闻、入口头两秒、化的方式、余味分段（按真实分钟退），和一张图。每盒盖子内侧有一张人留的便签。
+
+## 机的四个动作（加一个翻包装）
+
+| 工具 | 是什么 |
+|---|---|
+| `snackbox_look(box="")` | 看桌上；带盒名就是掀开那盒看托盘 |
+| `snackbox_pick(box, piece, why="")` | 挑一颗。手取出来、拆包装、举到鼻子前。`why` 手听见就算，不存 |
+| `snackbox_open()` | 张嘴。入口、化开、余味开始计时，一张图 |
+| `snackbox_mouth()` | 现在嘴里还有什么，按真的时钟 |
+| `snackbox_label()` | 把包装翻到背面看配料表 |
+
+吃多了肚子会沉、甜的后味会发酸——手会说，但不拦。
+
+## 接上
 
 ```bash
-/opt/homebrew/bin/python3.12 -m venv venv && venv/bin/pip install -r requirements.txt
-venv/bin/python tests/smoke.py        # 三不关 + 流程 + 余味时钟 + 衰减
+git clone https://github.com/shenchesilas-stack/snackbox.git && cd snackbox
+python3.12 -m venv venv && venv/bin/pip install -r requirements.txt
+venv/bin/python tests/smoke.py        # 关 + 流程 + 时钟 + 衰减
 venv/bin/python tests/e2e_stdio.py    # 真走一遍 MCP stdio（含图）
-venv/bin/python gate.py data/chocolate  # 给她过舌头前先过机器这道
 ```
 
-接进 Claude Code / Desktop（stdio）：
+Claude Code / Claude Desktop / 任何 stdio MCP 客户端：
 
 ```json
 {"mcpServers": {"snackbox": {"command": "/绝对路径/snackbox/venv/bin/python",
                              "args": ["/绝对路径/snackbox/snackbox_mcp.py"]}}}
 ```
 
-环境变量见 `snackbox_mcp.py` 文件头。`--reset` 补货，`--status` 看剩余。
+没有 MCP 客户端也能吃：`venv/bin/python tools/eat.py look` / `pick 铁盒 t03` / `open` / `mouth` / `label`。
+
+环境变量见 `snackbox_mcp.py` 文件头：`SNACKBOX_HOME` 状态目录（只记几点递了哪颗，不记食客一个字）、`SNACKBOX_IMG` 图的边长（0 不返图）、`SNACKBOX_HTTP` 端口（远程部署）。`--reset` 补货。
+
+## 三不自检是代码
+
+`gate.py` 在启动时硬调用：每颗文本、每盒便签、工具描述、服务器 instructions、手自己的话，全过一遍。不许对食客下指令、不许送能耐、不许换人、不许标语、不许拿在乎当筹码（"她会失望"那种）、颗的文本连"你"都不许出现。不过的：颗拒载，盒拒载，手的话不过关服务不起。给她过舌头前先 `venv/bin/python gate.py data/chocolate`。
+
+## 谁做的
+
+一个人和她家的机。她的舌头是 ground truth（`docs/舌头记录.md`），文字草稿由 codex 起，她纠，机重写；图走 codex 订阅生成，每颗的图里托盘只空它那格。设计核心在 `docs/2026-09-02-巧克力盒-设计核心.md`。
+
+想接进自己的平台、想加一盒、想挑错：发 issue。零食文本欢迎补充，但每颗上架前要过两道：`gate.py`，和一个真吃过的人。
 
 ## 目录
 
-- `snackbox_mcp.py` 服务（五个工具：look / pick / open / mouth / label）
-- `gate.py` 三不自检，启动时硬调用；不过的颗拒载、盒拒载、手的话不过服务不起
-- `data/chocolate/` 正式盒（tin / bar / candy），只放过了舌头的
-- `data/_sample/` 样例盒，只给测试用
-- `assets/<box>/<piece>.png` 每颗一张图（写实微距）
-- `tests/` 冒烟、stdio 端到端、关的反例夹具
-
-## 生图（样图/每颗的图）
-
-走 codex 订阅，零成本：把提示词写进文件，`codex exec --skip-git-repo-check -C <出图目录> --sandbox workspace-write "$(cat prompt.txt)" < /dev/null`。
-**必须 `< /dev/null`**，否则父进程等着时 codex 会挂在 "Reading additional input from stdin"（09-02 踩过，卡了十分钟）。
-
-## 草稿进盒（codex 起草 → 她过舌头）
-
-codex 的 JSON 存到 `drafts/`（不进 git），然后：
-```bash
-venv/bin/python tools/draft_to_box.py drafts/tin_codex.json --box 3_tin --name 铁盒 --kind tin --look "……" --table drafts/tin_review.md
-```
-出关报告 + 过舌头表。她改完、【待舌头】清零，再加 `--out data/chocolate/3_tin.json` 落盘。
+- `snackbox_mcp.py` 服务 · `gate.py` 关 · `data/chocolate/` 三盒 · `assets/` 图
+- `tools/eat.py` 命令行的嘴 · `tools/draft_to_box.py` 草稿装盒 · `tools/gen_images.py` 生图
+- `tests/` 冒烟、stdio 端到端、关的反例 · `docs/` 设计核心、工具面、舌头记录、前人侦察
