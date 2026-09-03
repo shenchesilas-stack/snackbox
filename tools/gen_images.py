@@ -17,6 +17,10 @@ STYLE = ("mouth-watering editorial food photography, rich, warm, slightly moody.
          "and glossy but hold their shape; a bar square only just softens at one corner.")
 
 SCENE = {
+    "bag": "A brown paper bag of freshly roasted chestnuts, the top folded open, a few chestnuts spilled onto the wood, "
+           "glossy dark-brown shells with a lighter fuzzy base, some split open from the heat; in front, one chestnut peeled: "
+           "the shell cracked in two beside it, the thin papery inner skin half torn away, the pale golden nutmeat exposed, "
+           "a wisp of steam. Details: ",
     "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
@@ -40,7 +44,7 @@ def build(box, piece, all_pieces):
             tray_list="; ".join(others),
             this="%s. Shape and surface: %s. Inside after breaking: %s" % (piece["name"], piece["tray"], piece["look"]))
     else:
-        scene = SCENE[kind] + " Details: " + piece["look"]
+        scene = SCENE.get(kind, SCENE["bar"]) + (" Details: " if kind != "bag" else "") + piece["look"]
     return "%s\n\nSubject: %s" % (STYLE, scene)
 
 
@@ -51,8 +55,9 @@ def main():
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry", action="store_true")
     a = ap.parse_args()
-    box = json.load(open(os.path.join(ROOT, "data", "chocolate", a.box + ".json"), encoding="utf-8"))
-    out_dir = os.path.join(ROOT, "assets", box["id"])
+    cat, _, bid = a.box.partition("/") if "/" in a.box else ("chocolate", "/", a.box)   # 用法：gen_images.py chestnut/1_bag
+    box = json.load(open(os.path.join(ROOT, "data", cat, bid + ".json"), encoding="utf-8"))
+    out_dir = os.path.join(ROOT, "assets", cat, box["id"])
     os.makedirs(out_dir, exist_ok=True)
     only = set(x for x in a.only.split(",") if x)
     jobs = []
@@ -74,7 +79,7 @@ def main():
         parts.append("\n### Item %d → save as: %s\n%s" % (i, dst, build(box, p, box["pieces"])))
     parts.append("\nWhen done, print the absolute paths of all saved files.")
     prompt = "\n".join(parts)
-    work = os.path.join(ROOT, "drafts", "imggen_" + box["id"])
+    work = os.path.join(ROOT, "drafts", "imggen_" + cat + "_" + box["id"])
     os.makedirs(work, exist_ok=True)
     open(os.path.join(work, "prompt.txt"), "w", encoding="utf-8").write(prompt)
     print("%d jobs · prompt → %s/prompt.txt" % (len(jobs), work))

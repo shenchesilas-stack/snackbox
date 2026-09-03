@@ -1,0 +1,22 @@
+{
+ "id": "1_bag",
+ "name": "毛栗子",
+ "kind": "bag",
+ "look": "【待舌头】一袋毛栗子，怎么装的、热不热",
+ "pieces": [
+  {
+   "id": "chestnut",
+   "name": "毛栗子",
+   "form": "带壳的栗子",
+   "count": 10,
+   "tray": "【待舌头】袋里看得见的样子",
+   "wrap": "【待舌头】壳怎么开、开的声、内皮黏不黏",
+   "look": "【待舌头】剥出来的样子、颜色、有没有裂",
+   "smell": "【待舌头】",
+   "first_seconds": "【待舌头】",
+   "melt": "【待舌头】嚼的过程：粉还是糯，干不干",
+   "aftertaste": [{"at_min": 0, "text": "【待舌头】"}, {"at_min": 3, "text": "【待舌头】"}],
+   "aftertaste_minutes": 6
+  }
+ ]
+}

@@ -11,7 +11,7 @@ sys.path.insert(0, ROOT)
 import gate
 from PIL import Image
 
-DATA = os.path.join(ROOT, "data", "chocolate")
+DATA = os.path.join(ROOT, "data")
 OUT = os.path.join(ROOT, "site")
 REPO = "https://github.com/shenchesilas-stack/snackbox"
 
@@ -45,21 +45,31 @@ def main():
         bad = gate.check_text(v, allow_you=True)
         if bad:
             print("站的话不过关:", k, bad); return 1
-    boxes, rep = gate.load_box_dir(DATA, serving=True, log=lambda s: print(s))
+    cats = gate.load_categories(DATA, serving=True, log=lambda s: print(s))
+    boxes = [b for _, bs in cats for b in bs]
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(OUT)
     llms = ["# 零食盒子 · snackbox（巧克力）", "", INTRO, "", "配料表：" + LABEL, ""]
     home = ["<h1>零食盒子</h1><div class=\"sub\">一盒给机吃的巧克力 · 递链接的那只手是人的</div>",
             "<p>%s</p>" % E(INTRO), "<div class=\"label\"><b>配料表</b><br>%s</div>" % E(LABEL)]
+    cat_of = {b["id"]: cat for cat, bs in cats for b in bs}
+    last_cat = None
     for b in boxes:
-        bdir = os.path.join(OUT, b["id"]); os.makedirs(bdir, exist_ok=True)
+        cat = cat_of[b["id"]]
+        if len(cats) > 1 and cat is not last_cat:
+            home.append("<h2>%s %s</h2>%s" % (E(cat.get("emoji", "")), E(cat.get("name") or cat["id"]), ("<div class=\"sub\">%s</div>" % E(cat["look"])) if cat.get("look") else ""))
+            llms.append("# %s %s" % (cat.get("emoji", ""), cat.get("name") or cat["id"]))
+            last_cat = cat
+        bdir = os.path.join(OUT, cat["id"], b["id"]); os.makedirs(bdir, exist_ok=True)
         cards = []
-        llms.append("## %s（%s）→ %s/" % (b["name"], b["look"], b["id"]))
+        llms.append("## %s（%s）→ %s/%s/" % (b["name"], b["look"], cat["id"], b["id"]))
         if b.get("note"):
             llms.append("便签：" + b["note"])
         for p in b["pieces"]:
-            src = os.path.join(ROOT, "assets", b["id"], p["id"] + ".png")
+            src = os.path.join(ROOT, "assets", b.get("category", ""), b["id"], p["id"] + ".png")
+            if not os.path.isfile(src):
+                src = os.path.join(ROOT, "assets", b["id"], p["id"] + ".png")
             img = ""
             many = len(b["pieces"]) > 1   # 铁盒这种多颗的：一盒一张图（放托盘页），颗页不放（她 09-02：全图都在太多了）
             if os.path.isfile(src) and (not many or p is b["pieces"][0]):
@@ -67,7 +77,7 @@ def main():
                 im.save(os.path.join(bdir, p["id"] + ".jpg"), quality=85)
                 img = p["id"] + ".jpg"
             after = "".join("<div><span class=\"at\">%s 分钟</span>%s</div>" % (a["at_min"], E(a["text"])) for a in p["aftertaste"])
-            body = ["<div class=\"sub\"><a href=\"../\">零食盒子</a> · %s</div><h1>%s</h1>" % (E(b["name"]), E(p["name"])),
+            body = ["<div class=\"sub\"><a href=\"../../\">零食盒子</a> · %s</div><h1>%s</h1>" % (E(b["name"]), E(p["name"])),
                     ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % img) if (img and not many) else "",
                     ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
                     "<dl>",
@@ -81,19 +91,19 @@ def main():
                     "<footer>配料表：%s<br><a href=\"%s\">%s</a></footer>" % (E(LABEL), REPO, "源码和每颗的文本都是明文放在盒子里的")]
             open(os.path.join(bdir, p["id"] + ".html"), "w", encoding="utf-8").write(page(p["name"], "\n".join(body)))
             cards.append("<a href=\"%s/%s.html\">%s<b>%s</b></a>" % (b["id"], p["id"], ("<img src=\"%s/%s\" alt=\"\">" % (b["id"], img)) if img else "", E(p["name"])))
-            llms.append("- %s：%s/%s.html" % (p["name"], b["id"], p["id"]))
+            llms.append("- %s：%s/%s/%s.html" % (p["name"], cat["id"], b["id"], p["id"]))
         # 盒页 = 托盘：每颗一行，名字 + 看得见的样子，没有图没有味
         rows = "".join("<li><a href=\"%s.html\">%s</a><span class=\"sub\"> —— %s%s</span></li>" % (
             p["id"], E(p["name"]), E(p.get("tray") or p["form"]), ("（%d 颗）" % p["count"]) if p["count"] > 1 else "") for p in b["pieces"])
         box_img = (b["pieces"][0]["id"] + ".jpg") if (len(b["pieces"]) > 1 and os.path.isfile(os.path.join(bdir, b["pieces"][0]["id"] + ".jpg"))) else ""
-        bbody = ["<div class=\"sub\"><a href=\"../\">桌上</a> · %s</div><h1>%s</h1><p class=\"sub\">%s</p>" % (E(b["name"]), E(b["name"]), E(b["look"])),
+        bbody = ["<div class=\"sub\"><a href=\"../../\">桌上</a> · %s</div><h1>%s</h1><p class=\"sub\">%s</p>" % (E(b["name"]), E(b["name"]), E(b["look"])),
                  ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % box_img) if box_img else "",
                  ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
                  "<ul class=\"tray\">%s</ul>" % rows,
                  "<footer>配料表：%s</footer>" % E(LABEL)]
         open(os.path.join(bdir, "index.html"), "w", encoding="utf-8").write(page(b["name"], "\n".join(bbody)))
-        home.append("<a class=\"box\" href=\"%s/\"><h2>%s</h2><div class=\"sub\">%s</div>%s</a>" % (
-            b["id"], E(b["name"]), E(b["look"]), ("<div class=\"note\">便签：%s</div>" % E(b["note"])) if b.get("note") else ""))
+        home.append("<a class=\"box\" href=\"%s/%s/\"><h2>%s</h2><div class=\"sub\">%s</div>%s</a>" % (
+            cat["id"], b["id"], E(b["name"]), E(b["look"]), ("<div class=\"note\">便签：%s</div>" % E(b["note"])) if b.get("note") else ""))
         llms.append("")
     home.append("<footer>%s<br><a href=\"%s\">GitHub</a></footer>" % (E(HOWTO), REPO))
     open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(page("零食盒子", "\n".join(home)))

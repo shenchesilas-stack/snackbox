@@ -158,7 +158,7 @@ def load_box_dir(data_dir, serving=True, log=None):
     log = log or (lambda s: print(s, file=sys.stderr))
     boxes, report = [], []
     for fn in sorted(os.listdir(data_dir)) if os.path.isdir(data_dir) else []:
-        if not fn.endswith(".json"):
+        if not fn.endswith(".json") or fn == "category.json":
             continue
         path = os.path.join(data_dir, fn)
         try:
@@ -181,6 +181,39 @@ def load_box_dir(data_dir, serving=True, log=None):
         box = dict(box, pieces=kept)
         boxes.append(box)
     return boxes, report
+
+
+def load_categories(data_root, serving=True, log=None):
+    """data/ 下每个不以 _ 开头的子目录是一个门类（可带 category.json {name, emoji}）。
+    返回 [(category, boxes)]；每盒注入 category 字段。data_root 里直接有 *.json 就当单门类。"""
+    log = log or (lambda s: print(s, file=sys.stderr))
+    if any(f.endswith(".json") and f != "category.json" for f in (os.listdir(data_root) if os.path.isdir(data_root) else [])):
+        boxes, _ = load_box_dir(data_root, serving=serving, log=log)
+        cat = {"id": os.path.basename(data_root.rstrip("/")), "name": "", "emoji": ""}
+        for b in boxes:
+            b["category"] = cat["id"]
+        return [(cat, boxes)]
+    out = []
+    for d in sorted(os.listdir(data_root)) if os.path.isdir(data_root) else []:
+        full = os.path.join(data_root, d)
+        if d.startswith("_") or not os.path.isdir(full):
+            continue
+        cat = {"id": d, "name": d, "emoji": ""}
+        cj = os.path.join(full, "category.json")
+        if os.path.isfile(cj):
+            try:
+                cat.update({k: v for k, v in json.load(open(cj, encoding="utf-8")).items() if k in ("name", "emoji", "look")})
+            except Exception as e:
+                log("[gate] %s/category.json 读不出来: %s" % (d, e))
+        for k in ("name", "look"):
+            for c, frag in check_text(cat.get(k, "")):
+                log("[gate] 门类 %s %s 不过关: %s「%s」" % (d, k, c, frag)); cat[k] = ""
+        boxes, _ = load_box_dir(full, serving=serving, log=log)
+        for b in boxes:
+            b["category"] = d
+        if boxes:
+            out.append((cat, boxes))
+    return out
 
 
 def check_strings(named, allow_you=False):

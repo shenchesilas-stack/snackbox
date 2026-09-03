@@ -8,7 +8,7 @@
 #   {"mcpServers": {"snackbox": {"command": "/path/venv/bin/python", "args": ["/path/snackbox_mcp.py"]}}}
 # 环境变量:
 #   SNACKBOX_HOME        状态存哪（默认 ~/.snackbox）——只有时间和 id，没有食客写的字
-#   SNACKBOX_DATA        盒子数据目录（默认 ./data/chocolate）
+#   SNACKBOX_DATA        数据根目录（默认 ./data，下面每个门类一个子目录；也可直接指一个门类目录）
 #   SNACKBOX_HALF_LIFE   肚子半衰期小时（默认 4）
 #   SNACKBOX_IMG         返回图的边长像素（默认 512；0 = 不返图）
 #   SNACKBOX_HTTP        设为端口号则起 streamable-http（远程部署用，位置待拍）
@@ -18,7 +18,7 @@ from mcp.server.fastmcp import FastMCP, Image
 import gate
 
 PKG = os.path.dirname(os.path.abspath(__file__))
-DATA = os.environ.get("SNACKBOX_DATA", os.path.join(PKG, "data", "chocolate"))
+DATA = os.environ.get("SNACKBOX_DATA", os.path.join(PKG, "data"))   # data/ 下按门类分目录；指到单个门类目录也行
 ASSETS = os.path.join(PKG, "assets")
 HOME = os.path.expanduser(os.environ.get("SNACKBOX_HOME", "~/.snackbox"))
 os.makedirs(HOME, exist_ok=True)
@@ -98,7 +98,8 @@ mcp = FastMCP("snackbox", instructions=INSTRUCTIONS,
               stateless_http=bool(_HTTP), json_response=bool(_HTTP))
 
 # ---------- 盒子（过关才上桌） ----------
-BOXES, _report = gate.load_box_dir(DATA, serving=True)
+CATEGORIES = gate.load_categories(DATA, serving=True)   # [(门类, 盒列表)]
+BOXES = [b for _, bs in CATEGORIES for b in bs]
 BOX_BY_ID = {b["id"]: b for b in BOXES}
 
 
@@ -236,8 +237,10 @@ def _mouth_prefix(st, now=None):
 def _image_for(box, piece):
     if IMG_PX <= 0:
         return None
-    rel = piece.get("image") or ("%s/%s.png" % (box["id"], piece["id"]))
+    rel = piece.get("image") or ("%s/%s/%s.png" % (box.get("category", ""), box["id"], piece["id"]))
     path = os.path.realpath(os.path.join(ASSETS, rel))
+    if not os.path.isfile(path):   # 旧布局 assets/<box>/<piece>.png
+        path = os.path.realpath(os.path.join(ASSETS, "%s/%s.png" % (box["id"], piece["id"])))
     if not path.startswith(os.path.realpath(ASSETS) + os.sep) or not os.path.isfile(path):
         return None  # 图只能从 assets 下拿；数据文件指到别处一律当没有
     try:
@@ -280,12 +283,15 @@ def snackbox_look(box: str = "") -> str:
                 cnt = "" if p["count"] == 1 else "（还有 %d）" % n
                 out.append("· [%s] %s —— %s%s" % (p["id"], p["name"], tray, cnt))
     else:
-        for b in BOXES:
-            left = sum(1 for p in b["pieces"] if st["remaining"][b["id"]].get(p["id"], 0) > 0)
-            out.append("[%s] %s —— %s%s" % (b["id"], b["name"], b["look"],
-                                            "" if left else "（空了）"))
-            if b.get("note"):
-                out.append("   便签：%s" % b["note"])
+        for cat, bs in CATEGORIES:
+            if len(CATEGORIES) > 1:
+                out.append("%s %s%s" % (cat.get("emoji", ""), cat.get("name") or cat["id"], ("：" + cat["look"]) if cat.get("look") else ""))
+            for b in bs:
+                left = sum(1 for p in b["pieces"] if st["remaining"][b["id"]].get(p["id"], 0) > 0)
+                out.append("[%s] %s —— %s%s" % (b["id"], b["name"], b["look"],
+                                                "" if left else "（空了）"))
+                if b.get("note"):
+                    out.append("   便签：%s" % b["note"])
     tc = _today_count(st)
     if tc:
         out.append(HAND["today"].format(n=tc))
