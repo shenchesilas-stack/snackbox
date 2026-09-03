@@ -35,6 +35,32 @@ a.box{display:block;text-decoration:none;color:var(--fg)}a.box h2{margin-top:0}.
 E = html.escape
 
 
+def variant(piece, n, seed="site"):
+    """和 snackbox_mcp._variant 同款：按第几颗套 stages，第三颗起按概率碰坏果（种子固定，站是静的）。"""
+    import hashlib
+    v = dict(piece)
+    for stg in sorted(piece.get("stages") or [], key=lambda x: x.get("from", x.get("at", 1))):
+        hit = (n == int(stg["at"])) if "at" in stg else (n >= int(stg.get("from", 1)))
+        if hit:
+            v.update({k: val for k, val in stg.items() if k not in ("from", "at")})
+    if n >= 3 and piece.get("duds"):
+        h = int(hashlib.sha1(("%s|%s|%d" % (seed, piece["id"], n)).encode()).hexdigest()[:8], 16) / 0xFFFFFFFF
+        acc = 0.0
+        for d in piece["duds"]:
+            acc += float(d.get("p", 0))
+            if h < acc:
+                v.update({k: val for k, val in d.items() if k != "p"}); v["_dud"] = True; break
+    return v
+
+
+def load_line(cat, n):
+    """肚子那行：静态站没有真时钟，就按第几颗当 load。"""
+    for floor, line in sorted(((float(a), b) for a, b in (cat.get("load") or [])), key=lambda x: -x[0]):
+        if n >= floor and floor >= 2 and line:
+            return line
+    return ""
+
+
 def page(title, body, depth=0):
     return ("<!doctype html><html lang=\"zh\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
             "<title>%s</title><style>%s</style></head><body><main>%s</main></body></html>" % (E(title), CSS, body))
@@ -76,20 +102,48 @@ def main():
                 im = Image.open(src).convert("RGB"); im.thumbnail((768, 768))
                 im.save(os.path.join(bdir, p["id"] + ".jpg"), quality=85)
                 img = p["id"] + ".jpg"
-            after = "".join("<div><span class=\"at\">%s 分钟</span>%s</div>" % (a["at_min"], E(a["text"])) for a in p["aftertaste"])
-            body = ["<div class=\"sub\"><a href=\"../../\">零食盒子</a> · %s</div><h1>%s</h1>" % (E(b["name"]), E(p["name"])),
-                    ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % img) if (img and not many) else "",
-                    ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
-                    "<dl>",
-                    "<dt>包装</dt><dd>%s</dd>" % E(p["wrap"]),
-                    "<dt>看</dt><dd>%s</dd>" % E(p["look"]),
-                    "<dt>闻</dt><dd>%s</dd>" % E(p["smell"]),
-                    "<dt>入口头两秒</dt><dd>%s</dd>" % E(p["first_seconds"]),
-                    "<dt>化的方式</dt><dd>%s</dd>" % E(p["melt"]),
-                    "<dt>余味（大约 %s 分钟散完）</dt><dd>%s</dd>" % (p["aftertaste_minutes"], after),
-                    "</dl>",
-                    "<footer>配料表：%s<br><a href=\"%s\">%s</a></footer>" % (E(LABEL), REPO, "源码和每颗的文本都是明文放在盒子里的")]
-            open(os.path.join(bdir, p["id"] + ".html"), "w", encoding="utf-8").write(page(p["name"], "\n".join(body)))
+            def piece_body(v, n=None, total=None, dud=False):
+                after = "".join("<div><span class=\"at\">%s 分钟</span>%s</div>" % (a["at_min"], E(a["text"])) for a in v["aftertaste"])
+                head = "<div class=\"sub\"><a href=\"../../\">零食盒子</a> · <a href=\"./\">%s</a></div><h1>%s%s</h1>" % (
+                    E(b["name"]), E(p["name"]), (" · 第 %d 颗" % n) if n else "")
+                parts = [head,
+                         ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % img) if (img and not many and (n in (None, 1))) else "",
+                         ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if (b.get("note") and n in (None, 1)) else "",
+                         ("<p>%s</p>" % E(b["open"])) if (b.get("open") and n in (None, 1)) else "",
+                         "<dl>",
+                         "<dt>包装</dt><dd>%s</dd>" % E(v["wrap"]),
+                         "<dt>看</dt><dd>%s</dd>" % E(v["look"]),
+                         "<dt>闻</dt><dd>%s</dd>" % E(v["smell"]),
+                         "<dt>入口头两秒</dt><dd>%s</dd>" % E(v["first_seconds"]),
+                         "<dt>化的方式</dt><dd>%s</dd>" % E(v["melt"]),
+                         "<dt>余味（大约 %s 分钟散完）</dt><dd>%s</dd>" % (v["aftertaste_minutes"], after),
+                         "</dl>"]
+                ll = load_line(cat, n) if n else ""
+                if ll:
+                    parts.append("<p class=\"sub\">%s</p>" % E(ll))
+                if n and total:
+                    nav = ("<a href=\"%d.html\">← 上一颗</a>　" % (n - 1)) if n > 1 else ""
+                    nav += ("<a href=\"%d.html\">下一颗 →</a>" % (n + 1)) if n < total else "<span class=\"sub\">这袋空了。</span>"
+                    parts.append("<p>%s</p>" % nav)
+                parts.append("<footer>配料表：%s<br><a href=\"%s\">%s</a></footer>" % (E(LABEL), REPO, "源码和每颗的文本都是明文放在盒子里的"))
+                return "\n".join(parts)
+            total = int(p.get("count", 1))
+            if total > 1 and (p.get("stages") or p.get("duds")):
+                pdir = os.path.join(bdir, p["id"]); os.makedirs(pdir, exist_ok=True)
+                for n in range(1, total + 1):
+                    v = variant(p, n)
+                    open(os.path.join(pdir, "%d.html" % n), "w", encoding="utf-8").write(page("%s · 第 %d 颗" % (p["name"], n), piece_body(v, n, total)))
+                # 颗的入口页 = 第 1 颗
+                open(os.path.join(bdir, p["id"] + ".html"), "w", encoding="utf-8").write(
+                    "<!doctype html><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=%s/1.html\"><a href=\"%s/1.html\">%s</a>" % (p["id"], p["id"], E(p["name"])))
+                img_fix = ("../" + img) if img else ""
+                # 第 1 颗页里的图/便签相对路径要多退一层：重写一遍
+                for n in range(1, total + 1):
+                    v = variant(p, n)
+                    body = piece_body(v, n, total).replace("<img src=\"%s\"" % img, "<img src=\"%s\"" % img_fix).replace("href=\"../../\"", "href=\"../../../\"").replace("href=\"./\"", "href=\"../\"")
+                    open(os.path.join(pdir, "%d.html" % n), "w", encoding="utf-8").write(page("%s · 第 %d 颗" % (p["name"], n), body))
+            else:
+                open(os.path.join(bdir, p["id"] + ".html"), "w", encoding="utf-8").write(page(p["name"], piece_body(p)))
             cards.append("<a href=\"%s/%s.html\">%s<b>%s</b></a>" % (b["id"], p["id"], ("<img src=\"%s/%s\" alt=\"\">" % (b["id"], img)) if img else "", E(p["name"])))
             llms.append("- %s：%s/%s/%s.html" % (p["name"], cat["id"], b["id"], p["id"]))
         # 盒页 = 托盘：每颗一行，名字 + 看得见的样子，没有图没有味
