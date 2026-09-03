@@ -28,10 +28,10 @@ SCENE = {
            "recognition, only soft warm bokeh and vague shapes, no readable objects. Details: ",    "chips": "A foil chip bag STANDING UPRIGHT on the wood, its top torn open across, the tear ragged and off to one side, the "
              "bag still mostly full and holding its shape; in front of it on the table only a FEW potato chips (four or five), "
              "one broken, a few crumbs. No logo, no text on the bag, but keep its real color and feel: {tray}. {hint} "
-             "Salt crystals and oil sheen visible on the chips. Details: ",    "plate": "On a plain white ceramic plate: one choux au craquelin cream puff, golden-brown with a crackled cookie top "
-             "in a rough honeycomb pattern, cut in half; the thin choux wall, pale yellow inside, is completely filled with "
-             "thick white mascarpone cream that holds its shape, not runny; a few crumbs of craquelin on the plate; underneath "
-             "the other half a small filling hole with a dab of cream. Details: ",
+             "Salt crystals and oil sheen visible on the chips. Details: ",    "plate": "On a plain white ceramic plate: one whole choux au craquelin cream puff, golden-brown with a crackled cookie "
+             "top in a rough honeycomb pattern, with ONE BITE taken out of one side (a ragged bite mark, not a clean cut); through "
+             "the bite the thin choux wall, pale yellow inside, is seen filled with thick white mascarpone cream that holds its "
+             "shape, not runny; a few crumbs of craquelin on the plate. Details: ",
     "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
