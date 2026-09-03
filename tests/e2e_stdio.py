@@ -15,7 +15,7 @@ async def main():
             assert "没有任务" in (init.instructions or ""), init.instructions
             tools = await s.list_tools()
             names = sorted(t.name for t in tools.tools)
-            assert names == ["snackbox_label", "snackbox_look", "snackbox_mouth", "snackbox_open", "snackbox_pick"], names
+            assert names == ["snackbox_keep", "snackbox_kept", "snackbox_label", "snackbox_look", "snackbox_mouth", "snackbox_open", "snackbox_pick"], names
             lab = await s.call_tool("snackbox_label", {})
             assert "谁做的" in lab.content[0].text
             look = await s.call_tool("snackbox_look", {})

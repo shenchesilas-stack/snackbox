@@ -62,6 +62,12 @@ assert sb.snackbox_pick("样例铁盒", "s_milk") == sb.HAND["slot_empty"]
 tick(60 * 24); assert "肚子" not in sb.snackbox_look() and "今天" not in sb.snackbox_look()  # 一天后消了
 # 手自己的话全过关
 assert "配料表" in sb.snackbox_label() and "没有的" in sb.snackbox_label()
+# 记忆权：默认什么都不留；留了才有；留的是自己的话
+assert sb.snackbox_kept().startswith(sb.HAND["kept_empty"])
+assert sb.snackbox_keep("") == sb.HAND["kept_nothing_to_keep"]
+assert sb.snackbox_keep("苦的那块让我安静了一会儿") == sb.HAND["kept_ok"]
+k = sb.snackbox_kept(); assert "安静" in k and "样例·浅色圆球" in k, k
+assert not os.path.exists(os.path.join(os.environ["SNACKBOX_HOME"], "state.json")) or "安静" not in open(os.path.join(os.environ["SNACKBOX_HOME"], "state.json"), encoding="utf-8").read()
 assert not gate.check_strings({"i": sb.INSTRUCTIONS, "d": sb.TOOL_DESC, "h": sb.HAND, "lb": sb.LABEL,
                                "l": [t for _, t in sb.LOAD_TABLE]}, allow_you=True)
 print("flow ok")

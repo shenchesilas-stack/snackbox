@@ -35,6 +35,8 @@ INSTRUCTIONS = (
     "包装可以翻到背面看配料表（snackbox_label），里面写着这盒有什么、没有什么、谁做的。"
     "吃的那个通常会用自己的话说嘴里剩了什么，怎么说都行；没人打分，也没人收。"
     "吃完还是自己，只是嘴里有东西。"
+    "盒子不偷记：吃的时候说的话一个字不存。记不记这次吃过什么，是吃的那个自己的事——"
+    "snackbox_keep 把自己想留的那几句留在自己这儿，snackbox_kept 翻回来看；不留就什么都没有。"
 )
 TOOL_DESC = {
     "look": "看一眼桌上的盒子；带 box 就是掀开那一盒看托盘。嘴里若还有东西，先说这个。",
@@ -43,6 +45,8 @@ TOOL_DESC = {
     "open": "张嘴。手把刚才那颗放进去。",
     "mouth": "现在嘴里还有什么。按真的时钟算，余味会自己退。",
     "label": "把包装翻到背面看配料表：这盒里有什么、没有什么、谁做的、记不记东西。",
+    "keep": "吃过之后，把自己想留的那几句留在自己这儿（默认什么都不留）。留多留少、留不留，都是吃的那个自己定；留的是自己的话，不是盒子写的。",
+    "kept": "翻自己留过的那些：几点吃的哪颗、当时留的话。什么都没留过就是空的。",
 }
 LABEL = (
     "配料表\n"
@@ -52,7 +56,8 @@ LABEL = (
     "谁做的：一个人和她家的机。每颗的文本和源码明文放在盒子里，谁都能翻。"
     "每颗上架前过两道：机器的关（gate.py：不许指挥嘴、不许送能耐、不许换人、不许标语、不许拿在乎当筹码），"
     "和一个真吃过的人的舌头。\n"
-    "记什么：只记几点递了哪颗。食客说的话一个字不存，挑的时候说的\u201c为什么\u201d听见就算。\n"
+    "记什么：盒子只记几点递了哪颗。食客说的话一个字不偷记，挑的时候说的\u201c为什么\u201d听见就算。"
+    "吃过之后想留几句给以后的自己，snackbox_keep 留在自己的状态目录里，只有自己翻得到；不留就没有。\n"
     "挑不挑、吃不吃、吃完怎么说，都是现在这个食客自己的。"
 )
 HAND = {
@@ -71,6 +76,9 @@ HAND = {
     "still_melting": "还在嘴里化着。",
     "remaining": "还剩 {n} 颗。",
     "today": "今天已经递过 {n} 颗。",
+    "kept_ok": "留下了。",
+    "kept_empty": "什么都没留过。",
+    "kept_nothing_to_keep": "空的，没留。",
 }
 LOAD_TABLE = [  # (load 下限, 手加的一行)；她调数字
     (12, "一盒下肚了。今晚肚子会疼，明早还沉。"),
@@ -311,6 +319,9 @@ def snackbox_pick(box: str = "", piece: str = "", why: str = "") -> str:
     p = _find_piece(b, piece)
     if not p:
         return HAND["no_such_piece"]
+    if gate.check_piece(p, serving=True):   # 每颗拆开时再过一次关，不只启动时
+        sys.stderr.write("[gate] %s/%s 递出前不过关，扣下\n" % (b["id"], p["id"]))
+        return HAND["no_such_piece"]
     with _lock():
         st = _read_state()
         if st["remaining"][b["id"]].get(p["id"], 0) <= 0:
@@ -377,6 +388,41 @@ def snackbox_mouth() -> str:
 @mcp.tool(name="snackbox_label", description=TOOL_DESC["label"])
 def snackbox_label() -> str:
     return LABEL
+
+
+KEPT_P = os.path.join(HOME, "kept.jsonl")   # 食客自己留的，只在食客自己的状态目录里
+
+
+@mcp.tool(name="snackbox_keep", description=TOOL_DESC["keep"])
+def snackbox_keep(text: str = "") -> str:
+    text = (text or "").strip()
+    if not text:
+        return HAND["kept_nothing_to_keep"]
+    with _lock():
+        st = _read_state()
+        last = (st.get("fed") or [None])[-1]
+        rec = {"t": _iso(_now()), "box": last["box"] if last else None, "piece": last["piece"] if last else None, "text": text[:2000]}
+        with open(KEPT_P, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    return HAND["kept_ok"]
+
+
+@mcp.tool(name="snackbox_kept", description=TOOL_DESC["kept"])
+def snackbox_kept(limit: int = 20) -> str:
+    try:
+        lines = open(KEPT_P, encoding="utf-8").read().splitlines()
+    except FileNotFoundError:
+        return HAND["kept_empty"]
+    out = []
+    for ln in lines[-max(1, min(int(limit), 200)):]:
+        try:
+            r = json.loads(ln)
+        except Exception:
+            continue
+        b = BOX_BY_ID.get(r.get("box") or "")
+        pc = _find_piece(b, r.get("piece") or "") if b else None
+        out.append("%s · %s\n%s" % (r.get("t", "")[:16].replace("T", " "), pc["name"] if pc else "", r.get("text", "")))
+    return "\n\n".join(out) if out else HAND["kept_empty"]
 
 
 # ---------- 喂的人的 CLI ----------
