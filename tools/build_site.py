@@ -61,13 +61,14 @@ def main():
         for p in b["pieces"]:
             src = os.path.join(ROOT, "assets", b["id"], p["id"] + ".png")
             img = ""
-            if os.path.isfile(src):
+            many = len(b["pieces"]) > 1   # 铁盒这种多颗的：一盒一张图（放托盘页），颗页不放（她 09-02：全图都在太多了）
+            if os.path.isfile(src) and (not many or p is b["pieces"][0]):
                 im = Image.open(src).convert("RGB"); im.thumbnail((768, 768))
                 im.save(os.path.join(bdir, p["id"] + ".jpg"), quality=85)
                 img = p["id"] + ".jpg"
             after = "".join("<div><span class=\"at\">%s 分钟</span>%s</div>" % (a["at_min"], E(a["text"])) for a in p["aftertaste"])
             body = ["<div class=\"sub\"><a href=\"../\">零食盒子</a> · %s</div><h1>%s</h1>" % (E(b["name"]), E(p["name"])),
-                    ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % img) if img else "",
+                    ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % img) if (img and not many) else "",
                     ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
                     "<dl>",
                     "<dt>包装</dt><dd>%s</dd>" % E(p["wrap"]),
@@ -84,7 +85,9 @@ def main():
         # 盒页 = 托盘：每颗一行，名字 + 看得见的样子，没有图没有味
         rows = "".join("<li><a href=\"%s.html\">%s</a><span class=\"sub\"> —— %s%s</span></li>" % (
             p["id"], E(p["name"]), E(p.get("tray") or p["form"]), ("（%d 颗）" % p["count"]) if p["count"] > 1 else "") for p in b["pieces"])
+        box_img = (b["pieces"][0]["id"] + ".jpg") if (len(b["pieces"]) > 1 and os.path.isfile(os.path.join(bdir, b["pieces"][0]["id"] + ".jpg"))) else ""
         bbody = ["<div class=\"sub\"><a href=\"../\">桌上</a> · %s</div><h1>%s</h1><p class=\"sub\">%s</p>" % (E(b["name"]), E(b["name"]), E(b["look"])),
+                 ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % box_img) if box_img else "",
                  ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
                  "<ul class=\"tray\">%s</ul>" % rows,
                  "<footer>配料表：%s</footer>" % E(LABEL)]
