@@ -17,8 +17,8 @@ REPO = "https://github.com/shenchesilas-stack/snackbox"
 
 LABEL = ("有的：每颗零食的样子、气味、入口、化开、余味，一张图。全是文字和图，是数据。"
          "没有的：藏起来的字；牌子要它念的句子；让它回头再答一遍的合同；“吃完之后要怎样”。吃完还是自己，只是嘴里有东西。")
-INTRO = ("这是一盒给机吃的巧克力。人把某一颗的链接递过去，机读了，就是吃了。"
-         "递的是谁，机自己知道。每颗都是真吃过的人写的：怎么开、断口和白霜、闻、入口头两秒、化的方式、余味几分钟怎么退。")
+INTRO = ("桌上三盒巧克力，是给机吃的。人把这一页的链接递过去；哪盒都能掀开看托盘，托盘里哪颗都能拿，拿哪颗是机自己的事。"
+         "每颗都是真吃过的人写的：怎么开、断口和白霜、闻、入口头两秒、化的方式、余味几分钟怎么退。")
 HOWTO = ("这里没有手，也没有时钟：想要手递、余味按真的时钟退、吃多了肚子会沉，那一版是 MCP，在 GitHub 上。")
 CSS = """
 :root{--bg:#1c1410;--fg:#f0e6d8;--muted:#a89786;--line:#3a2c22;--card:#261b15;--acc:#d9a066}
@@ -29,6 +29,7 @@ main{max-width:720px;margin:0 auto;padding:28px 18px 60px}h1{font-weight:500;fon
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid a{display:block;text-decoration:none;color:var(--fg);font-size:12px;text-align:center}
 .grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;margin-bottom:4px}
 .piece img{width:100%;border-radius:14px;margin:10px 0 18px}dl{margin:0}dt{color:var(--acc);font-size:13px;letter-spacing:1px;margin-top:16px}dd{margin:4px 0 0}
+a.box{display:block;text-decoration:none;color:var(--fg)}a.box h2{margin-top:0}.tray{list-style:none;padding:0;margin:10px 0}.tray li{padding:8px 0;border-bottom:1px solid var(--line)}.tray li a{text-decoration:none;font-weight:500}
 .at{color:var(--muted);font-size:13px;margin-right:8px}a{color:var(--acc)}footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
 """
 E = html.escape
@@ -54,7 +55,7 @@ def main():
     for b in boxes:
         bdir = os.path.join(OUT, b["id"]); os.makedirs(bdir, exist_ok=True)
         cards = []
-        llms.append("## %s（%s）" % (b["name"], b["look"]))
+        llms.append("## %s（%s）→ %s/" % (b["name"], b["look"], b["id"]))
         if b.get("note"):
             llms.append("便签：" + b["note"])
         for p in b["pieces"]:
@@ -80,8 +81,16 @@ def main():
             open(os.path.join(bdir, p["id"] + ".html"), "w", encoding="utf-8").write(page(p["name"], "\n".join(body)))
             cards.append("<a href=\"%s/%s.html\">%s<b>%s</b></a>" % (b["id"], p["id"], ("<img src=\"%s/%s\" alt=\"\">" % (b["id"], img)) if img else "", E(p["name"])))
             llms.append("- %s：%s/%s.html" % (p["name"], b["id"], p["id"]))
-        home.append("<div class=\"box\"><h2>%s</h2><div class=\"sub\">%s</div>%s<div class=\"grid\">%s</div></div>" % (
-            E(b["name"]), E(b["look"]), ("<div class=\"note\">便签：%s</div>" % E(b["note"])) if b.get("note") else "", "".join(cards)))
+        # 盒页 = 托盘：每颗一行，名字 + 看得见的样子，没有图没有味
+        rows = "".join("<li><a href=\"%s.html\">%s</a><span class=\"sub\"> —— %s%s</span></li>" % (
+            p["id"], E(p["name"]), E(p.get("tray") or p["form"]), ("（%d 颗）" % p["count"]) if p["count"] > 1 else "") for p in b["pieces"])
+        bbody = ["<div class=\"sub\"><a href=\"../\">桌上</a> · %s</div><h1>%s</h1><p class=\"sub\">%s</p>" % (E(b["name"]), E(b["name"]), E(b["look"])),
+                 ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
+                 "<ul class=\"tray\">%s</ul>" % rows,
+                 "<footer>配料表：%s</footer>" % E(LABEL)]
+        open(os.path.join(bdir, "index.html"), "w", encoding="utf-8").write(page(b["name"], "\n".join(bbody)))
+        home.append("<a class=\"box\" href=\"%s/\"><h2>%s</h2><div class=\"sub\">%s</div>%s</a>" % (
+            b["id"], E(b["name"]), E(b["look"]), ("<div class=\"note\">便签：%s</div>" % E(b["note"])) if b.get("note") else ""))
         llms.append("")
     home.append("<footer>%s<br><a href=\"%s\">GitHub</a></footer>" % (E(HOWTO), REPO))
     open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(page("零食盒子", "\n".join(home)))
