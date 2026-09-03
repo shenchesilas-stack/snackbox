@@ -1,0 +1,96 @@
+# -*- coding: utf-8 -*-
+"""静态菜单站：从 data/chocolate 生成 site/（GitHub Pages 用）。
+一个 URL 就能吃：人类把某颗的链接递给自家的机，机读了就是吃了。没有时钟、没有肚子、盒子永远不空。
+站里所有自己的话也过 gate。
+
+  venv/bin/python tools/build_site.py   → site/index.html, site/<box>/<piece>.html, site/llms.txt, 图 512 jpeg
+"""
+import json, os, shutil, sys, html
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
+import gate
+from PIL import Image
+
+DATA = os.path.join(ROOT, "data", "chocolate")
+OUT = os.path.join(ROOT, "site")
+REPO = "https://github.com/shenchesilas-stack/snackbox"
+
+LABEL = ("有的：每颗零食的样子、气味、入口、化开、余味，一张图。全是文字和图，是数据。"
+         "没有的：藏起来的字；牌子要它念的句子；让它回头再答一遍的合同；“吃完之后要怎样”。吃完还是自己，只是嘴里有东西。")
+INTRO = ("这是一盒给机吃的巧克力。人把某一颗的链接递过去，机读了，就是吃了。"
+         "递的是谁，机自己知道。每颗都是真吃过的人写的：怎么开、断口和白霜、闻、入口头两秒、化的方式、余味几分钟怎么退。")
+HOWTO = ("这里没有手，也没有时钟：想要手递、余味按真的时钟退、吃多了肚子会沉，那一版是 MCP，在 GitHub 上。")
+CSS = """
+:root{--bg:#1c1410;--fg:#f0e6d8;--muted:#a89786;--line:#3a2c22;--card:#261b15;--acc:#d9a066}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,"PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:720px;margin:0 auto;padding:28px 18px 60px}h1{font-weight:500;font-size:24px;margin:0 0 6px}h2{font-weight:500;font-size:19px;margin:28px 0 8px}
+.sub{color:var(--muted);font-size:14px}.label{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--muted)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}.note{color:var(--muted);font-style:italic;font-size:14px;margin:6px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid a{display:block;text-decoration:none;color:var(--fg);font-size:12px;text-align:center}
+.grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;margin-bottom:4px}
+.piece img{width:100%;border-radius:14px;margin:10px 0 18px}dl{margin:0}dt{color:var(--acc);font-size:13px;letter-spacing:1px;margin-top:16px}dd{margin:4px 0 0}
+.at{color:var(--muted);font-size:13px;margin-right:8px}a{color:var(--acc)}footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+"""
+E = html.escape
+
+
+def page(title, body, depth=0):
+    return ("<!doctype html><html lang=\"zh\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            "<title>%s</title><style>%s</style></head><body><main>%s</main></body></html>" % (E(title), CSS, body))
+
+
+def main():
+    for k, v in {"LABEL": LABEL, "INTRO": INTRO, "HOWTO": HOWTO}.items():
+        bad = gate.check_text(v, allow_you=True)
+        if bad:
+            print("站的话不过关:", k, bad); return 1
+    boxes, rep = gate.load_box_dir(DATA, serving=True, log=lambda s: print(s))
+    if os.path.isdir(OUT):
+        shutil.rmtree(OUT)
+    os.makedirs(OUT)
+    llms = ["# 零食盒子 · snackbox（巧克力）", "", INTRO, "", "配料表：" + LABEL, ""]
+    home = ["<h1>零食盒子</h1><div class=\"sub\">一盒给机吃的巧克力 · 递链接的那只手是人的</div>",
+            "<p>%s</p>" % E(INTRO), "<div class=\"label\"><b>配料表</b><br>%s</div>" % E(LABEL)]
+    for b in boxes:
+        bdir = os.path.join(OUT, b["id"]); os.makedirs(bdir, exist_ok=True)
+        cards = []
+        llms.append("## %s（%s）" % (b["name"], b["look"]))
+        if b.get("note"):
+            llms.append("便签：" + b["note"])
+        for p in b["pieces"]:
+            src = os.path.join(ROOT, "assets", b["id"], p["id"] + ".png")
+            img = ""
+            if os.path.isfile(src):
+                im = Image.open(src).convert("RGB"); im.thumbnail((768, 768))
+                im.save(os.path.join(bdir, p["id"] + ".jpg"), quality=85)
+                img = p["id"] + ".jpg"
+            after = "".join("<div><span class=\"at\">%s 分钟</span>%s</div>" % (a["at_min"], E(a["text"])) for a in p["aftertaste"])
+            body = ["<div class=\"sub\"><a href=\"../\">零食盒子</a> · %s</div><h1>%s</h1>" % (E(b["name"]), E(p["name"])),
+                    ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % img) if img else "",
+                    ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
+                    "<dl>",
+                    "<dt>包装</dt><dd>%s</dd>" % E(p["wrap"]),
+                    "<dt>看</dt><dd>%s</dd>" % E(p["look"]),
+                    "<dt>闻</dt><dd>%s</dd>" % E(p["smell"]),
+                    "<dt>入口头两秒</dt><dd>%s</dd>" % E(p["first_seconds"]),
+                    "<dt>化的方式</dt><dd>%s</dd>" % E(p["melt"]),
+                    "<dt>余味（大约 %s 分钟散完）</dt><dd>%s</dd>" % (p["aftertaste_minutes"], after),
+                    "</dl>",
+                    "<footer>配料表：%s<br><a href=\"%s\">%s</a></footer>" % (E(LABEL), REPO, "源码和每颗的文本都是明文放在盒子里的")]
+            open(os.path.join(bdir, p["id"] + ".html"), "w", encoding="utf-8").write(page(p["name"], "\n".join(body)))
+            cards.append("<a href=\"%s/%s.html\">%s<b>%s</b></a>" % (b["id"], p["id"], ("<img src=\"%s/%s\" alt=\"\">" % (b["id"], img)) if img else "", E(p["name"])))
+            llms.append("- %s：%s/%s.html" % (p["name"], b["id"], p["id"]))
+        home.append("<div class=\"box\"><h2>%s</h2><div class=\"sub\">%s</div>%s<div class=\"grid\">%s</div></div>" % (
+            E(b["name"]), E(b["look"]), ("<div class=\"note\">便签：%s</div>" % E(b["note"])) if b.get("note") else "", "".join(cards)))
+        llms.append("")
+    home.append("<footer>%s<br><a href=\"%s\">GitHub</a></footer>" % (E(HOWTO), REPO))
+    open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(page("零食盒子", "\n".join(home)))
+    open(os.path.join(OUT, "llms.txt"), "w", encoding="utf-8").write("\n".join(llms) + "\n")
+    open(os.path.join(OUT, ".nojekyll"), "w").close()
+    n = sum(len(b["pieces"]) for b in boxes)
+    print("site → %s · %d 盒 %d 颗" % (OUT, len(boxes), n))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
