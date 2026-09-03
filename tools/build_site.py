@@ -107,6 +107,16 @@ def main():
         llms.append("")
     home.append("<footer>%s<br><a href=\"%s\">GitHub</a></footer>" % (E(HOWTO), REPO))
     open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(page("零食盒子", "\n".join(home)))
+    # 旧链接兼容：巧克力以前在根目录 /<盒>/<颗>.html，转到 /chocolate/<盒>/<颗>.html
+    for cat, bs in cats:
+        if cat["id"] != "chocolate":
+            continue
+        for b in bs:
+            od = os.path.join(OUT, b["id"]); os.makedirs(od, exist_ok=True)
+            for name in ["index"] + [p["id"] for p in b["pieces"]]:
+                target = "../chocolate/%s/%s.html" % (b["id"], name) if name != "index" else "../chocolate/%s/" % b["id"]
+                open(os.path.join(od, name + ".html"), "w", encoding="utf-8").write(
+                    "<!doctype html><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=%s\"><a href=\"%s\">%s</a>" % (target, target, target))
     open(os.path.join(OUT, "llms.txt"), "w", encoding="utf-8").write("\n".join(llms) + "\n")
     open(os.path.join(OUT, ".nojekyll"), "w").close()
     n = sum(len(b["pieces"]) for b in boxes)
