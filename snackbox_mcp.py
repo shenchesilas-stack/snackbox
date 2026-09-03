@@ -347,7 +347,8 @@ def snackbox_look(box: str = "") -> str:
     else:
         for cat, bs in CATEGORIES:
             if len(CATEGORIES) > 1:
-                out.append("%s %s%s" % (cat.get("emoji", ""), cat.get("name") or cat["id"], ("：" + cat["look"]) if cat.get("look") else ""))
+                head = ((cat.get("emoji", "") + " ") if cat.get("emoji") else "") + (cat.get("name") or cat["id"])
+                out.append("%s%s" % (head, ("：" + cat["look"]) if cat.get("look") else ""))
             for b in bs:
                 left = sum(1 for p in b["pieces"] if st["remaining"][b["id"]].get(p["id"], 0) > 0)
                 out.append("[%s] %s —— %s%s" % (b["id"], b["name"], b["look"],

@@ -1,10 +1,11 @@
 {
  "name": "泡芙",
- "emoji": "🫧",
+ "emoji": "",
  "look": "盘子上就一个，酥皮顶疙里疙瘩的，金褐色。一个就够。",
  "load": [],
  "wishes": [
   "她 09-03·正在吃"
  ],
- "order": 4
+ "order": 4,
+ "icon": "cream-puff.png"
 }
