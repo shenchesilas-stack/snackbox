@@ -171,28 +171,18 @@ def main():
                 open(os.path.join(bdir, p["id"] + ".html"), "w", encoding="utf-8").write(page(p["name"], piece_body(p, nav=nav, depth=2, first=True), depth=2))
             cards.append("<a href=\"%s/%s.html\">%s<b>%s</b></a>" % (b["id"], p["id"], ("<img src=\"%s/%s\" alt=\"\">" % (b["id"], img)) if img else "", E(p["name"])))
             llms.append("- %s：%s/%s/%s.html" % (p["name"], cat["id"], b["id"], p["id"]))
-        single = len(b["pieces"]) == 1
-        if single:
-            # 第一刀（前端腿 09-03，她拍的）：单种盒没有"掀盖"这个动作，首页直接到那一颗；旧托盘 URL 留转发
-            p0 = b["pieces"][0]
-            open(os.path.join(bdir, "index.html"), "w", encoding="utf-8").write(
-                "<!doctype html><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=%s.html\"><a href=\"%s.html\">%s</a>" % (p0["id"], p0["id"], E(p0["name"])))
-            home.append("<a class=\"box\" href=\"%s/%s/%s.html\"><h2>%s</h2><div class=\"sub\">%s</div></a>" % (
-                cat["id"], b["id"], p0["id"], E(b["name"]), E(b["look"])))
-        else:
-            # 盒页 = 托盘：每颗一行，名字 + 看得见的样子，没有图没有味；便签在这儿（掀开才见）
-            rows = "".join("<li><a href=\"%s.html\">%s</a><span class=\"sub\"> —— %s%s</span></li>" % (
-                p["id"], E(p["name"]), E(p.get("tray") or p["form"]), ("（%d 颗）" % p["count"]) if p["count"] > 1 else "") for p in b["pieces"])
-            box_img = (b["pieces"][0]["id"] + ".jpg") if os.path.isfile(os.path.join(bdir, b["pieces"][0]["id"] + ".jpg")) else ""
-            bbody = ["<div class=\"sub\"><a href=\"../../\">桌上</a> · %s</div><h1>%s</h1><p class=\"sub\">%s</p>" % (E(b["name"]), E(b["name"]), E(b["look"])),
-                     ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % box_img) if box_img else "",
-                     ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
-                     "<ul class=\"tray\">%s</ul>" % rows,
-                     "<footer>配料表：%s</footer>" % E(LABEL)]
-            open(os.path.join(bdir, "index.html"), "w", encoding="utf-8").write(page(b["name"], "\n".join(bbody), depth=2))
-            # 第二刀：首页每盒只有 look（橱窗），便签不在首页
-            home.append("<a class=\"box\" href=\"%s/%s/\"><h2>%s</h2><div class=\"sub\">%s</div></a>" % (
-                cat["id"], b["id"], E(b["name"]), E(b["look"])))
+        # 盒页 = 托盘：每颗一行，名字 + 看得见的样子，没有图没有味
+        rows = "".join("<li><a href=\"%s.html\">%s</a><span class=\"sub\"> —— %s%s</span></li>" % (
+            p["id"], E(p["name"]), E(p.get("tray") or p["form"]), ("（%d 颗）" % p["count"]) if p["count"] > 1 else "") for p in b["pieces"])
+        box_img = (b["pieces"][0]["id"] + ".jpg") if (len(b["pieces"]) > 1 and os.path.isfile(os.path.join(bdir, b["pieces"][0]["id"] + ".jpg"))) else ""
+        bbody = ["<div class=\"sub\"><a href=\"../../\">桌上</a> · %s</div><h1>%s</h1><p class=\"sub\">%s</p>" % (E(b["name"]), E(b["name"]), E(b["look"])),
+                 ("<div class=\"piece\"><img src=\"%s\" alt=\"\"></div>" % box_img) if box_img else "",
+                 ("<div class=\"note\">盒盖内侧的便签：%s</div>" % E(b["note"])) if b.get("note") else "",
+                 "<ul class=\"tray\">%s</ul>" % rows,
+                 "<footer>配料表：%s</footer>" % E(LABEL)]
+        open(os.path.join(bdir, "index.html"), "w", encoding="utf-8").write(page(b["name"], "\n".join(bbody), depth=2))
+        home.append("<a class=\"box\" href=\"%s/%s/\"><h2>%s</h2><div class=\"sub\">%s</div>%s</a>" % (
+            cat["id"], b["id"], E(b["name"]), E(b["look"]), ("<div class=\"note\">便签：%s</div>" % E(b["note"])) if b.get("note") else ""))
         llms.append("")
     home.append("<footer>%s<br><a href=\"%s\">GitHub</a></footer>" % (E(HOWTO), REPO))
     open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(page("零食盒子", "\n".join(home)))
