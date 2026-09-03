@@ -107,6 +107,10 @@ def _now():
     return datetime.datetime.now()
 
 
+def _today():
+    return _now().date().isoformat()
+
+
 def _iso(dt):
     return dt.replace(microsecond=0).isoformat()
 
@@ -205,6 +209,40 @@ def _today_count(st, now=None):
     return sum(1 for f in st["fed"] if f["t"][:10] == d)
 
 
+# ---------- 第几颗（同一坐）+ 坏果 ----------
+SITTING_H = 2.0   # 两小时内算同一坐
+
+
+def _nth(st, box_id, piece_id, now=None):
+    """这颗在同一坐里是第几颗（含这一颗）。"""
+    now = now or _now()
+    n = 1
+    for f in st.get("fed", []):
+        if f.get("box") == box_id and f.get("piece") == piece_id:
+            if (now - _parse(f["t"])).total_seconds() / 3600.0 <= SITTING_H:
+                n += 1
+    return n
+
+
+def _variant(piece, n, seed=""):
+    """按第几颗套 stages，第三颗起按概率碰坏果。返回一个合成后的颗（不改原数据）。"""
+    v = dict(piece)
+    for stg in sorted(piece.get("stages") or [], key=lambda x: x.get("from", 1)):
+        if n >= int(stg.get("from", 1)):
+            v.update({k: val for k, val in stg.items() if k != "from"})
+    if n >= 3 and piece.get("duds"):
+        import hashlib
+        h = int(hashlib.sha1(("%s|%s|%d" % (seed, piece["id"], n)).encode()).hexdigest()[:8], 16) / 0xFFFFFFFF
+        acc = 0.0
+        for d in piece["duds"]:
+            acc += float(d.get("p", 0))
+            if h < acc:
+                v.update({k: val for k, val in d.items() if k != "p"})
+                v["_dud"] = True
+                break
+    return v
+
+
 # ---------- 嘴 ----------
 def _mouth_stage(st, now=None):
     """返回 (还在不在, 当前段文本)。不在 = 散了/空的。"""
@@ -215,6 +253,7 @@ def _mouth_stage(st, now=None):
     piece = _find_piece(box, m["piece"]) if box else None
     if not piece:
         return False, ""
+    piece = _variant(piece, int(m.get("n") or 1), seed=m.get("t", "")[:10])
     now = now or _now()
     mins = (now - _parse(m["t"])).total_seconds() / 60.0
     if mins >= float(piece["aftertaste_minutes"]):
@@ -332,9 +371,11 @@ def snackbox_pick(box: str = "", piece: str = "", why: str = "") -> str:
         st = _read_state()
         if st["remaining"][b["id"]].get(p["id"], 0) <= 0:
             return HAND["slot_empty"]
-        st["held"] = {"box": b["id"], "piece": p["id"], "t": _iso(_now())}
+        n = _nth(st, b["id"], p["id"])
+        st["held"] = {"box": b["id"], "piece": p["id"], "t": _iso(_now()), "n": n}
         _write_state(st)
-    return "\n".join([p["name"], p["wrap"], p["look"], p["smell"]])
+    v = _variant(p, n, seed=_today())
+    return "\n".join([v["name"], v["wrap"], v["look"], v["smell"]])
 
 
 @mcp.tool(name="snackbox_open", description=TOOL_DESC["open"])
@@ -354,15 +395,17 @@ def snackbox_open() -> list:
         overlap, _ = _mouth_stage(st, now)
         st["remaining"][b["id"]][p["id"]] = max(0, st["remaining"][b["id"]].get(p["id"], 0) - 1)
         st["fed"] = (st["fed"] + [{"t": _iso(now), "box": b["id"], "piece": p["id"]}])[-500:]
-        st["mouth"] = {"box": b["id"], "piece": p["id"], "t": _iso(now)}
+        n = int(held.get("n") or 1)
+        st["mouth"] = {"box": b["id"], "piece": p["id"], "t": _iso(now), "n": n}
         st["held"] = None
         _write_state(st)
         load_line = _load_line(st, now)
+    v = _variant(p, n, seed=_today())
     lines = []
     if overlap:
         lines.append(HAND["overlap"])
-    lines += [p["first_seconds"], p["melt"],
-              HAND["aftertaste_hint"].format(m=int(round(float(p["aftertaste_minutes"]))))]
+    lines += [v["first_seconds"], v["melt"],
+              HAND["aftertaste_hint"].format(m=int(round(float(v["aftertaste_minutes"]))))]
     if load_line:
         lines.append(load_line)
     lines.append(HAND["closing"])

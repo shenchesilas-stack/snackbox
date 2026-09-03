@@ -46,7 +46,12 @@ RULES = {"祈使": IMPERATIVE, "buff": BUFF, "人格": PERSONA, "slogan": SLOGAN
 UNFINISHED = "【待舌头】"   # 没过舌头的颗，上架时拒载；起草期只是提醒
 
 PIECE_FIELDS = {"id", "name", "form", "cocoa", "count", "tray", "wrap", "look", "smell",
-                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image"}
+                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image", "stages", "duds"}
+# stages：同一坐吃到第几颗，话不一样（糖炒栗子：第一颗烫、第二颗最好吃、第四颗起跟壳较劲）
+#   [{"from": 1, <覆盖 wrap/look/smell/first_seconds/melt/aftertaste>}]
+# duds：坏果，按概率（黑的、苦的、壳跟肉长在一起）
+#   [{"p": 0.12, <覆盖同上>}]
+VARIANT_FIELDS = {"wrap", "look", "smell", "first_seconds", "melt", "aftertaste"}
 PIECE_REQUIRED = {"id", "name", "form", "count", "wrap", "look", "smell", "first_seconds", "melt",
                   "aftertaste", "aftertaste_minutes"}
 BOX_FIELDS = {"id", "name", "kind", "look", "note", "pieces"}
@@ -111,6 +116,21 @@ def check_piece(piece, serving=False):
         if k in piece:
             for cat, frag in check_text(piece[k], serving=serving):
                 probs.append("%s: %s「%s」" % (k, cat, frag))
+    for key, need in (("stages", "from"), ("duds", "p")):
+        for i, v in enumerate(piece.get(key) or []):
+            if not isinstance(v, dict) or need not in v:
+                probs.append("%s[%d] 缺 %s" % (key, i, need)); continue
+            extra = set(v) - VARIANT_FIELDS - {need}
+            if extra:
+                probs.append("%s[%d] 多出字段: %s" % (key, i, ",".join(sorted(extra))))
+            for k, t in v.items():
+                if k == "aftertaste" and isinstance(t, list):
+                    for st in t:
+                        for cat, frag in check_text((st or {}).get("text", ""), serving=serving):
+                            probs.append("%s[%d].aftertaste: %s「%s」" % (key, i, cat, frag))
+                elif k in VARIANT_FIELDS:
+                    for cat, frag in check_text(t, serving=serving):
+                        probs.append("%s[%d].%s: %s「%s」" % (key, i, k, cat, frag))
     if isinstance(at, list):
         for s in at:
             if isinstance(s, dict):

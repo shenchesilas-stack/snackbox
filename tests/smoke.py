@@ -71,3 +71,24 @@ assert not os.path.exists(os.path.join(os.environ["SNACKBOX_HOME"], "state.json"
 assert not gate.check_strings({"i": sb.INSTRUCTIONS, "d": sb.TOOL_DESC, "h": sb.HAND, "lb": sb.LABEL,
                                "l": [t for _, t in sb.LOAD_TABLE]}, allow_you=True)
 print("flow ok")
+
+# ---- 栗子：第几颗 + 坏果 ----
+import importlib
+os.environ["SNACKBOX_DATA"] = os.path.join(ROOT, "data", "chestnut")
+os.environ["SNACKBOX_HOME"] = tempfile.mkdtemp(prefix="snackbox-test-chestnut-")
+sb2 = importlib.reload(sb)
+sb2._now = lambda: clock["now"]
+assert [b["id"] for b in sb2.BOXES] == ["1_bag"]
+t1 = sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o1 = sb2.snackbox_open()[0]
+assert "第一颗一定烫" in o1, o1
+t2 = sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o2 = sb2.snackbox_open()[0]
+assert "第二颗最好吃" in o2, o2
+for _ in range(2): sb2.snackbox_pick("糖炒毛栗子", "chestnut"); sb2.snackbox_open()
+t4 = sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o4 = sb2.snackbox_open()[0]
+assert ("手指已经黑了" in t4 or "坏的" in t4) and ("较劲" in o4 or "苦" in o4), (t4, o4)
+tick(60 * 3)   # 三小时后另一坐，重新从第一颗算
+t = sb2.snackbox_pick("糖炒毛栗子", "chestnut"); o = sb2.snackbox_open()[0]
+assert "第一颗一定烫" in o, o
+# duds 确定性：同一天同第几颗同结果
+assert sb2._variant(sb2.BOXES[0]["pieces"][0], 5, seed="x") == sb2._variant(sb2.BOXES[0]["pieces"][0], 5, seed="x")
+print("chestnut stages ok")
