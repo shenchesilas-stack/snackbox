@@ -31,9 +31,9 @@ SCENE = {
              "Salt crystals and oil sheen visible on the chips. Details: ",    "plate": "On a small pale-yellow ceramic plate with a gently scalloped rim: one whole choux au craquelin cream puff, "
              "golden-brown with a crackled cookie top in a rough honeycomb pattern, with ONE BITE taken out of one side (a ragged "
              "bite mark, not a clean cut); through the bite the thin choux wall, pale yellow inside, is seen filled with thick white "
-             "mascarpone cream that holds its shape, not runny. Beside the puff on the plate: one small fresh yuzu, a bumpy-skinned "
-             "yellow-green citrus about the size of a golf ball, with a single glossy leaf, and one thin yuzu slice. A few crumbs of "
-             "craquelin. No text. Details: ",
+             "mascarpone cream that holds its shape, not runny. Beside the puff on the plate, as a small garnish only: ONE thin half-moon slice of yuzu "
+             "(NOT a lemon: yuzu peel is thick, bumpy and pale yellow-green, the flesh pale with large segments and a wide pith), "
+             "no whole fruit, no leaf. A few crumbs of craquelin. No text. Details: ",
     "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
