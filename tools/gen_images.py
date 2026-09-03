@@ -17,14 +17,13 @@ STYLE = ("mouth-watering editorial food photography, rich, warm, slightly moody.
          "and glossy but hold their shape; a bar square only just softens at one corner.")
 
 SCENE = {
-    "bag": "A brown paper bag of freshly roasted chestnuts (Chinese sugar-roasted chestnuts), the top folded open, a few "
-           "chestnuts spilled onto the wood: glossy dark mahogany shells, each with a pale rough fuzzy patch at the base, "
-           "several split open along a cut on the rounded side. In front, one chestnut peeled, photographed accurately like a "
-           "real Chinese chestnut, NOT a stylized dessert: the nutmeat is pale butter-yellow, kidney-shaped, one side flat and "
-           "one side rounded, MATTE surface with shallow irregular wrinkles and a faint seam where it would split into two lobes, "
-           "NO radial ridges, NO glossy dome; a few scraps of the thin papery brown inner skin still clinging to it; the two "
-           "halves of its dark shell lying beside it, the inside of the shell pale and papery; a faint wisp of steam. Details: ",
-    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
+    "bag": "HAND-HELD, not on a table: a person's hand holds a brown paper bag of freshly roasted Chinese sugar-roasted "
+           "chestnuts by pinching only the folded top corner between fingertips, because the bag is too hot to hold properly; "
+           "the bag is open and full of glossy dark mahogany chestnuts, many split open along a cut, a pale rough fuzzy patch "
+           "at each base, a few sugar-glazed spots; visible white steam rising out of the bag into the cool air. Background: an "
+           "evening street scene blurred beyond recognition, extremely shallow depth of field, only soft warm bokeh of lights and "
+           "vague shapes, no readable objects, no stall, no wok. "
+           "The hand looks natural and anatomically correct, five fingers, only fingertips touching the paper. Details: ",    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
            "near-black brown with a restrained sheen and a faint grey fat bloom on the broken edge. A few crumbs.",
@@ -41,6 +40,10 @@ SCENE = {
 
 def build(box, piece, all_pieces):
     kind = box["kind"]
+    if kind == "bag":
+        style = STYLE.replace("No hands, ", "").replace("Surface: dark walnut wood table, a little worn. ", "").replace(
+            "Camera pulled back so the subject occupies roughly a third of the frame, ", "Medium close shot, the bag and the hand fill about half the frame, ")
+        return "%s\n\nSubject: %s%s" % (style, SCENE["bag"], piece["look"])
     if kind == "tin":
         others = [p["tray"] for p in all_pieces if p["id"] != piece["id"]]
         scene = SCENE["tin"].format(
