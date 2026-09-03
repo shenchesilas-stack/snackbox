@@ -229,9 +229,9 @@ def _image_for(box, piece):
     if IMG_PX <= 0:
         return None
     rel = piece.get("image") or ("%s/%s.png" % (box["id"], piece["id"]))
-    path = os.path.join(ASSETS, rel)
-    if not os.path.isfile(path):
-        return None
+    path = os.path.realpath(os.path.join(ASSETS, rel))
+    if not path.startswith(os.path.realpath(ASSETS) + os.sep) or not os.path.isfile(path):
+        return None  # 图只能从 assets 下拿；数据文件指到别处一律当没有
     try:
         from PIL import Image as PILImage
         im = PILImage.open(path)
