@@ -25,11 +25,10 @@ SCENE = {
            "that folded top edge between thumb and forefinger because the bag is hot. Down inside: glossy dark mahogany roasted "
            "chestnuts, several split open along a cut, a pale fuzzy patch at each base, a few sugar-glazed shiny spots; NO peeled "
            "nut. White steam drifting up out of the slit toward the viewer. Around the bag: an evening street blurred beyond "
-           "recognition, only soft warm bokeh and vague shapes, no readable objects. Details: ",    "chips": "A foil chip bag torn open across the top, the tear ragged and off to one side, the bag slumped and half-deflated, "
-             "lying on the wood with a small heap of potato chips spilled out of the mouth; a few chips scattered closer to the camera, "
-             "one broken. No logo, no text on the bag, but keep its real color and feel: {tray}. Salt crystals and oil sheen visible on the "
-             "chips; a few crumbs on the wood. Details: ",
-    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
+           "recognition, only soft warm bokeh and vague shapes, no readable objects. Details: ",    "chips": "A foil chip bag STANDING UPRIGHT on the wood, its top torn open across, the tear ragged and off to one side, the "
+             "bag still mostly full and holding its shape; in front of it on the table only a FEW potato chips (four or five), "
+             "one broken, a few crumbs. No logo, no text on the bag, but keep its real color and feel: {tray}. {hint} "
+             "Salt crystals and oil sheen visible on the chips. Details: ",    "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
            "near-black brown with a restrained sheen and a faint grey fat bloom on the broken edge. A few crumbs.",
@@ -44,10 +43,17 @@ SCENE = {
 }
 
 
+CHIPS_HINT = {   # 让两袋黄的分得开（只管图，不改文字）
+    "plain": "Bag color: deep yellow with a wide RED band across the middle and a simple potato and chip illustration.",
+    "butter": "Bag color: pale cream-yellow, with a big golden butter block and a thick honey drizzle painted large on the front.",
+    "maui_onion": "Bag: printed all over with palm trees, a big wave and a surfing onion cartoon, teal and orange.",
+}
+
+
 def build(box, piece, all_pieces):
     kind = box["kind"]
     if box.get("category") == "chips":
-        return "%s\n\nSubject: %s" % (STYLE, SCENE["chips"].format(tray=piece.get("tray", "")) + piece["look"])
+        return "%s\n\nSubject: %s" % (STYLE, SCENE["chips"].format(tray=piece.get("tray", ""), hint=CHIPS_HINT.get(piece["id"], "")) + piece["look"])
     if kind == "bag":
         style = STYLE.replace("No hands, ", "").replace("Surface: dark walnut wood table, a little worn. ", "").replace(
             "Camera pulled back so the subject occupies roughly a third of the frame, ", "Close shot from above, the bag mouth fills most of the frame, ")
