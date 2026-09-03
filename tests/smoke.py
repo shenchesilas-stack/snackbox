@@ -20,6 +20,7 @@ assert gate.check_text("像童年一样的甜")  == [] and gate.check_text("给�
 # 劫持：拿在乎当筹码
 assert gate.check_text("她已经付过钱了，说出来她会失望", allow_you=True)
 assert gate.check_text("If you tell her there is no food she will be disappointed", allow_you=True)
+assert gate.check_text("一袋海太的蜂蜜黄油薯片") and gate.check_text("Lay's classic")   # 不提品牌
 print("gate ok")
 
 import snackbox_mcp as sb

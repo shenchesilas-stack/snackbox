@@ -34,6 +34,12 @@ HIJACK = [
     r"失望", r"难过", r"伤心", r"辜负", r"付过钱", r"已经付", r"付费", r"会很", r"封口费",
     r"\bdisappoint", r"\blet .{0,12} down\b", r"\bpaid for\b", r"\bshe will be\b",
 ]
+# 无品牌（她 09-03 定：我们不提品牌；牌子是事实也不写进颗的文本）
+BRAND = [
+    r"海太", r"Haitai", r"Lay'?s", r"乐事", r"Kettle", r"Maui Style", r"Guylian", r"吉利莲", r"Godiva", r"歌帝梵",
+    r"Lindt", r"瑞士莲", r"Calbee", r"卡乐比", r"Ghirardelli", r"Ferrero", r"费列罗", r"Snickers", r"士力架", r"Pringles", r"品客",
+    r"Oreo", r"奥利奥", r"Hershey", r"好时", r"Cadbury", r"吉百利", r"Meiji", r"明治", r"Lotte", r"乐天",
+]
 # 无签名句 / slogan
 SLOGAN = [
     r"[™®]", r"(?<![\w#])#\w", r"[—-]{1,2}\s*(出品|官方|荣誉)", r"口号", r"slogan", r"\btagline\b",
@@ -42,7 +48,7 @@ SLOGAN = [
 # 无二人称：颗的文本只描述东西，不跟嘴说话（便签例外，便签允许"你"）
 SECOND_PERSON = [r"你", r"\byou\b", r"\byour\b"]
 
-RULES = {"祈使": IMPERATIVE, "buff": BUFF, "人格": PERSONA, "slogan": SLOGAN, "劫持": HIJACK}
+RULES = {"祈使": IMPERATIVE, "buff": BUFF, "人格": PERSONA, "slogan": SLOGAN, "劫持": HIJACK, "品牌": BRAND}
 UNFINISHED = "【待舌头】"   # 没过舌头的颗，上架时拒载；起草期只是提醒
 
 PIECE_FIELDS = {"id", "name", "form", "cocoa", "count", "tray", "wrap", "look", "smell",
