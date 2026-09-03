@@ -7,4 +7,5 @@ main{max-width:720px;margin:0 auto;padding:28px 18px 60px}h1{font-weight:500;fon
 .grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block;margin-bottom:4px}
 .piece img{width:100%;border-radius:14px;margin:10px 0 18px}dl{margin:0}dt{color:var(--acc);font-size:13px;letter-spacing:1px;margin-top:16px}dd{margin:4px 0 0}
 a.box{display:block;text-decoration:none;color:var(--fg)}a.box h2{margin-top:0}.tray{list-style:none;padding:0;margin:10px 0}.tray li{padding:8px 0;border-bottom:1px solid var(--line)}.tray li a{text-decoration:none;font-weight:500}
+.emo{width:1.15em;height:1.15em;vertical-align:-0.2em}
 .at{color:var(--muted);font-size:13px;margin-right:8px}a{color:var(--acc)}footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
