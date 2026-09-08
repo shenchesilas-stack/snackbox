@@ -126,6 +126,8 @@ def main():
                          "<dt>闻</dt><dd>%s</dd>" % E(v["smell"]),
                          "<dt>入口头两秒</dt><dd>%s</dd>" % E(v["first_seconds"]),
                          "<dt>化的方式</dt><dd>%s</dd>" % E(v["melt"]),
+                         ("<dt>几口下去</dt><dd>%s</dd>" % "".join("<div>%s</div>" % E(t) for t in v["course"])) if v.get("course") else "",
+                         ("<dt>最后一口</dt><dd>%s</dd>" % E(v["finish"])) if v.get("finish") else "",
                          "<dt>余味（大约 %s 分钟散完）</dt><dd>%s</dd>" % (v["aftertaste_minutes"], after),
                          "</dl>"]
                 ll = load_line(cat, n) if n else ""

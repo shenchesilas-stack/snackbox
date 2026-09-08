@@ -14,10 +14,12 @@ sys.path.insert(0, ROOT)
 import gate
 
 COLS = ["id", "name", "form", "cocoa", "count", "tray", "wrap", "look", "smell",
-        "first_seconds", "melt", "aftertaste", "aftertaste_minutes"]
+        "first_seconds", "melt", "course", "finish", "aftertaste", "aftertaste_minutes"]
 
 
 def _cell(v):
+    if isinstance(v, list) and v and isinstance(v[0], str):
+        return "<br>".join(v)
     if isinstance(v, list):
         return "<br>".join("%s′ %s" % (s.get("at_min", "?"), s.get("text", "")) for s in v)
     return str(v if v is not None else "").replace("\n", " ").replace("|", "／")

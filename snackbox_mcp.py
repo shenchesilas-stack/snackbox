@@ -195,11 +195,7 @@ def _load(st, now=None):
         h = (now - _parse(f["t"])).total_seconds() / 3600.0
         if h < 0:
             h = 0
-        w = 1.0
-        b = BOX_BY_ID.get(f.get("box")); pc = _find_piece(b, f.get("piece")) if b else None
-        if pc and pc.get("unit") == "口" and int(pc.get("count", 1)) > 1:
-            w = 1.0 / int(pc["count"])   # 按口吃的东西，一口只算一个的几分之一
-        total += w * 0.5 ** (h / HALF_LIFE_H)
+        total += 0.5 ** (h / HALF_LIFE_H)
     return total
 
 
@@ -426,8 +422,6 @@ def snackbox_open() -> list:
             return [HAND["nothing_held"]]
         now = _now()
         overlap, _ = _mouth_stage(st, now)
-        if overlap and st.get("mouth", {}).get("piece") == p["id"] and p.get("unit") == "口":
-            overlap = False   # 同一个东西连着咬，不算叠
         st["remaining"][b["id"]][p["id"]] = max(0, st["remaining"][b["id"]].get(p["id"], 0) - 1)
         st["fed"] = (st["fed"] + [{"t": _iso(now), "box": b["id"], "piece": p["id"]}])[-500:]
         n = int(held.get("n") or 1)
@@ -439,8 +433,11 @@ def snackbox_open() -> list:
     lines = []
     if overlap:
         lines.append(HAND["overlap"])
-    lines += [v["first_seconds"], v["melt"],
-              HAND["aftertaste_hint"].format(m=int(round(float(v["aftertaste_minutes"]))))]
+    lines += [v["first_seconds"], v["melt"]]
+    lines += list(v.get("course") or [])          # 几口下去的变化
+    if v.get("finish"):
+        lines.append(v["finish"])                  # 最后一口
+    lines.append(HAND["aftertaste_hint"].format(m=int(round(float(v["aftertaste_minutes"])))))
     if load_line:
         lines.append(load_line)
     lines.append(HAND["closing"])

@@ -52,7 +52,8 @@ RULES = {"祈使": IMPERATIVE, "buff": BUFF, "人格": PERSONA, "slogan": SLOGAN
 UNFINISHED = "【待舌头】"   # 没过舌头的颗，上架时拒载；起草期只是提醒
 
 PIECE_FIELDS = {"id", "name", "form", "cocoa", "count", "tray", "wrap", "look", "smell",
-                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image", "stages", "duds", "unit"}   # unit：颗/片/口（一个东西分几口吃，count 就是口数）
+                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image", "stages", "duds", "unit", "course", "finish"}
+# course：一个东西吃几口的变化，几条短句（不是选择，就一次张嘴说完）；finish：最后一口
 # stages：同一坐吃到第几颗，话不一样（糖炒栗子：第一颗烫、第二颗最好吃、第四颗起跟壳较劲）
 #   [{"from": 1, <覆盖 wrap/look/smell/first_seconds/melt/aftertaste>}]
 # duds：坏果，按概率（黑的、苦的、壳跟肉长在一起）
@@ -118,10 +119,13 @@ def check_piece(piece, serving=False):
             probs.append("余味最后一段 at_min=%s 不早于散完时间 %s，永远打不出来" % (last, piece["aftertaste_minutes"]))
     if not isinstance(piece.get("count"), int) or piece.get("count", 0) < 1:
         probs.append("count 要是 ≥1 的整数")
-    for k in ("id", "name", "form", "tray", "wrap", "look", "smell", "first_seconds", "melt"):
+    for k in ("id", "name", "form", "tray", "wrap", "look", "smell", "first_seconds", "melt", "finish"):
         if k in piece:
             for cat, frag in check_text(piece[k], serving=serving):
                 probs.append("%s: %s「%s」" % (k, cat, frag))
+    for i, t in enumerate(piece.get("course") or []):
+        for cat, frag in check_text(t, serving=serving):
+            probs.append("course[%d]: %s「%s」" % (i, cat, frag))
     for key, need in (("stages", ("from", "at")), ("duds", ("p",))):
         for i, v in enumerate(piece.get(key) or []):
             if not isinstance(v, dict) or not any(k in v for k in need):
