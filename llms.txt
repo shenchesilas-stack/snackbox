@@ -51,3 +51,7 @@
 便签：看着老实，满肚子奶油承不住往外漏。吃的时候想起谁了，不用说。
 - 柚子马斯卡彭泡芙：cream-puff/1_plate/yuzu_mascarpone.html
 
+# 🍦 冰淇淋
+## 甜筒（一球粉的扣在脆皮筒上，筒底裹着纸，边上开始亮了。）→ ice-cream/1_cone/
+- 草莓甜筒：ice-cream/1_cone/strawberry_cone.html
+
