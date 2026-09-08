@@ -52,7 +52,7 @@ RULES = {"祈使": IMPERATIVE, "buff": BUFF, "人格": PERSONA, "slogan": SLOGAN
 UNFINISHED = "【待舌头】"   # 没过舌头的颗，上架时拒载；起草期只是提醒
 
 PIECE_FIELDS = {"id", "name", "form", "cocoa", "count", "tray", "wrap", "look", "smell",
-                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image", "stages", "duds"}
+                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image", "stages", "duds", "unit"}   # unit：颗/片/口（一个东西分几口吃，count 就是口数）
 # stages：同一坐吃到第几颗，话不一样（糖炒栗子：第一颗烫、第二颗最好吃、第四颗起跟壳较劲）
 #   [{"from": 1, <覆盖 wrap/look/smell/first_seconds/melt/aftertaste>}]
 # duds：坏果，按概率（黑的、苦的、壳跟肉长在一起）

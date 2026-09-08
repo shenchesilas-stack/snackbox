@@ -342,7 +342,7 @@ def snackbox_look(box: str = "") -> str:
                 out.append("· [%s] %s —— 空格" % (p["id"], p["name"]))
             else:
                 tray = p.get("tray") or p["form"]
-                cnt = "" if p["count"] == 1 else "（还有 %d）" % n
+                cnt = "" if p["count"] == 1 else "（还有 %d %s）" % (n, p.get("unit", "颗"))
                 out.append("· [%s] %s —— %s%s" % (p["id"], p["name"], tray, cnt))
     else:
         for cat, bs in CATEGORIES:
@@ -422,6 +422,8 @@ def snackbox_open() -> list:
             return [HAND["nothing_held"]]
         now = _now()
         overlap, _ = _mouth_stage(st, now)
+        if overlap and st.get("mouth", {}).get("piece") == p["id"] and p.get("unit") == "口":
+            overlap = False   # 同一个东西连着咬，不算叠
         st["remaining"][b["id"]][p["id"]] = max(0, st["remaining"][b["id"]].get(p["id"], 0) - 1)
         st["fed"] = (st["fed"] + [{"t": _iso(now), "box": b["id"], "piece": p["id"]}])[-500:]
         n = int(held.get("n") or 1)

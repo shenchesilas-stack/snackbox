@@ -153,7 +153,7 @@ def main():
                     else:
                         groups.append([key, n, n, v])
                 pdir = os.path.join(bdir, p["id"]); os.makedirs(pdir, exist_ok=True)
-                unit = "片" if cat["id"] == "chips" else "颗"
+                unit = p.get("unit") or ("片" if cat["id"] == "chips" else "颗")
                 for gi, (_, a, z, v) in enumerate(groups):
                     label = ("第 %d %s" % (a, unit)) if a == z else ("第 %d–%d %s" % (a, z, unit))
                     nav = ""
