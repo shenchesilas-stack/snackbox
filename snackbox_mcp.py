@@ -191,11 +191,15 @@ def _find_piece(box, q):
 def _load(st, now=None):
     now = now or _now()
     total = 0.0
-    for f in st["fed"]:
+    for f in st.get("fed", []):
         h = (now - _parse(f["t"])).total_seconds() / 3600.0
         if h < 0:
             h = 0
-        total += 0.5 ** (h / HALF_LIFE_H)
+        w = 1.0
+        b = BOX_BY_ID.get(f.get("box")); pc = _find_piece(b, f.get("piece")) if b else None
+        if pc and pc.get("unit") == "口" and int(pc.get("count", 1)) > 1:
+            w = 1.0 / int(pc["count"])   # 按口吃的东西，一口只算一个的几分之一
+        total += w * 0.5 ** (h / HALF_LIFE_H)
     return total
 
 
