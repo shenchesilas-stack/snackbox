@@ -34,7 +34,7 @@ SCENE = {
              "mascarpone cream that holds its shape, not runny. Beside the puff on the plate, as a small garnish only: ONE thin half-moon slice of yuzu "
              "(NOT a lemon: yuzu peel is thick, bumpy and pale yellow-green, the flesh pale with large segments and a wide pith), "
              "no whole fruit, no leaf. A few crumbs of craquelin. No text. Details: ",
-    "cone": "A single scoop of pale pink strawberry ice cream with small flecks of darker red fruit, sitting on a smooth "
+    "cone": "A single scoop of pale pink strawberry ice cream, an even soft pink with only two or three tiny, faint specks of slightly deeper pink fruit barely visible (NO red chunks), sitting on a smooth "
             "pale-yellow wafer cone (a plain sugar cone, smooth surface, not waffle-grid), the base of the cone wrapped in a "
             "crumpled square of white paper; the cone stands upright in a small plain metal cone holder on the wood; the scoop "
             "shows scoop marks and has just begun to melt, one drip starting down the rim. Details: ",
