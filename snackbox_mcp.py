@@ -465,6 +465,10 @@ def snackbox_open() -> list:
     if load_line:
         lines.append(load_line)
     lines.append(HAND["closing"])
+    # 图的落地路径（宿主自己配，比如小口袋要把图递给她看）：SNACKBOX_IMAGE_PATH_TEMPLATE="/var/www/x/{cat}/{box}/{piece}.jpg"
+    tpl = os.environ.get("SNACKBOX_IMAGE_PATH_TEMPLATE", "")
+    if tpl:
+        lines.append("图：" + tpl.format(cat=b.get("category", ""), box=b["id"], piece=p["id"]))
     out = ["\n".join(lines)]
     img = _image_for(b, p)
     if img is not None:
