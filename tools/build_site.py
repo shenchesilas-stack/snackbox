@@ -129,6 +129,7 @@ def main():
                          ("<dt>几口下去</dt><dd>%s</dd>" % "".join("<div>%s</div>" % E(t) for t in v["course"])) if v.get("course") else "",
                          ("<dt>最后一口</dt><dd>%s</dd>" % E(v["finish"])) if v.get("finish") else "",
                          "<dt>余味（大约 %s 分钟散完）</dt><dd>%s</dd>" % (v["aftertaste_minutes"], after),
+                         ("<dt>后劲（大约 %s 小时）</dt><dd>%s</dd>" % (v["after"]["hours"], E(v["after"]["text"]))) if v.get("after") else "",
                          "</dl>"]
                 ll = load_line(cat, n) if n else ""
                 if ll:

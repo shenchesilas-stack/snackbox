@@ -52,7 +52,8 @@ RULES = {"祈使": IMPERATIVE, "buff": BUFF, "人格": PERSONA, "slogan": SLOGAN
 UNFINISHED = "【待舌头】"   # 没过舌头的颗，上架时拒载；起草期只是提醒
 
 PIECE_FIELDS = {"id", "name", "form", "cocoa", "count", "tray", "wrap", "look", "smell",
-                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image", "stages", "duds", "unit", "course", "finish"}
+                "first_seconds", "melt", "aftertaste", "aftertaste_minutes", "image", "stages", "duds", "unit", "course", "finish", "after"}
+# after：后劲，散了以后还在身上的（咖啡因、辣、饱）：{"hours": 8, "text": "..."}，look/mouth 里跟着，到点就没了
 # course：一个东西吃几口的变化，几条短句（不是选择，就一次张嘴说完）；finish：最后一口
 # stages：同一坐吃到第几颗，话不一样（糖炒栗子：第一颗烫、第二颗最好吃、第四颗起跟壳较劲）
 #   [{"from": 1, <覆盖 wrap/look/smell/first_seconds/melt/aftertaste>}]
@@ -107,6 +108,9 @@ def check_piece(piece, serving=False):
     missing = PIECE_REQUIRED - set(piece)
     if missing:
         probs.append("缺字段: %s" % ",".join(sorted(missing)))
+    af = piece.get("after")
+    if af is not None and not (isinstance(af, dict) and isinstance(af.get("hours"), (int, float)) and af.get("hours", 0) > 0 and isinstance(af.get("text"), str) and af["text"].strip()):
+        probs.append("after 要是 {hours: 正数, text: 话}")
     at = piece.get("aftertaste")
     if not isinstance(at, list) or not at or not all(
             isinstance(s, dict) and set(s) == {"at_min", "text"} for s in at):
@@ -126,6 +130,9 @@ def check_piece(piece, serving=False):
     for i, t in enumerate(piece.get("course") or []):
         for cat, frag in check_text(t, serving=serving):
             probs.append("course[%d]: %s「%s」" % (i, cat, frag))
+    if isinstance(piece.get("after"), dict):
+        for cat, frag in check_text(str(piece["after"].get("text", "")), serving=serving):
+            probs.append("after: %s「%s」" % (cat, frag))
     for key, need in (("stages", ("from", "at")), ("duds", ("p",))):
         for i, v in enumerate(piece.get(key) or []):
             if not isinstance(v, dict) or not any(k in v for k in need):

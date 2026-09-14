@@ -297,9 +297,26 @@ def _mouth_stage(st, now=None):
     return True, stage
 
 
+def _after_lines(st, now=None):
+    """后劲：散了以后还在身上的。按吃下的时间，到点就没了。同一句只说一次。"""
+    now = now or _now()
+    out = []
+    for f in st.get("fed", []):
+        b = BOX_BY_ID.get(f.get("box"))
+        p = _find_piece(b, f.get("piece")) if b else None
+        af = (p or {}).get("after")
+        if not af:
+            continue
+        h = (now - _parse(f["t"])).total_seconds() / 3600.0
+        if 0 <= h < float(af["hours"]) and af["text"] not in out:
+            out.append(af["text"])
+    return out
+
+
 def _mouth_prefix(st, now=None):
     alive, stage = _mouth_stage(st, now)
-    return (stage + "\n") if alive and stage else ""
+    head = (stage + "\n") if alive and stage else ""
+    return head + "".join(t + "\n" for t in _after_lines(st, now))
 
 
 # ---------- 图 ----------
@@ -470,7 +487,8 @@ def snackbox_mouth() -> str:
         else:
             text = stage or HAND["mouth_empty"]
         ll = _load_line(st, now, floor_min=2)
-    return text + ("\n" + ll if ll else "")
+        af = _after_lines(st, now)
+    return text + "".join("\n" + t for t in af) + ("\n" + ll if ll else "")
 
 
 @mcp.tool(name="snackbox_label", description=TOOL_DESC["label"])
