@@ -101,6 +101,9 @@ mcp = FastMCP("snackbox", instructions=INSTRUCTIONS,
 CATEGORIES = gate.load_categories(DATA, serving=True)   # [(门类, 盒列表)]
 BOXES = [b for _, bs in CATEGORIES for b in bs]
 BOX_BY_ID = {b["id"]: b for b in BOXES}
+if len(BOX_BY_ID) != len(BOXES):
+    _dup = sorted({b["id"] for b in BOXES if sum(1 for x in BOXES if x["id"] == b["id"]) > 1})
+    sys.stderr.write("[gate] 盒 id 跨门类撞名，服务不起: %s\n" % _dup); sys.exit(3)
 CAT_BY_ID = {cat["id"]: cat for cat, _ in CATEGORIES}
 _bad_cat = gate.check_strings({"load_default": [t for _, t in LOAD_TABLE]}, allow_you=True)
 if _bad_cat:
@@ -188,10 +191,13 @@ def _find_piece(box, q):
 
 
 # ---------- 肚子（衰减曲线，替代上限） ----------
-def _load(st, now=None):
+def _load(st, now=None, cat=None):
+    """cat 给了就只算这个门类吃下的（门类自带肚子表时用）；没给算整个肚子。"""
     now = now or _now()
     total = 0.0
     for f in st.get("fed", []):
+        if cat and (BOX_BY_ID.get(f.get("box"), {}).get("category") != cat):
+            continue
         h = (now - _parse(f["t"])).total_seconds() / 3600.0
         if h < 0:
             h = 0
@@ -207,10 +213,11 @@ def _load_table_for(box):
 
 
 def _load_line(st, now=None, floor_min=0, box=None):
-    load = _load(st, now)
     if box is None:
         last = (st.get("fed") or [None])[-1]
         box = BOX_BY_ID.get(last["box"]) if last else None
+    cat = CAT_BY_ID.get((box or {}).get("category", ""), {})
+    load = _load(st, now, cat=box["category"] if (box and "load" in cat) else None)
     for floor, line in _load_table_for(box):
         if load >= floor and floor >= floor_min and line:
             return line
@@ -282,7 +289,7 @@ def _mouth_stage(st, now=None):
     if mins >= float(piece["aftertaste_minutes"]):
         return False, ""
     if mins < 1.0:
-        return True, HAND["still_melting"] + "\n" + piece["melt"]
+        return True, HAND["still_melting"] + "\n" + (piece.get("finish") or piece["melt"])
     stage = ""
     for s in sorted(piece["aftertaste"], key=lambda s: s["at_min"]):
         if mins >= float(s["at_min"]):

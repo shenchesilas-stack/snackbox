@@ -31,7 +31,8 @@ async def main(argv):
     env = dict(os.environ)
     env.setdefault("SNACKBOX_HOME", os.path.expanduser("~/.snackbox"))
     params = StdioServerParameters(command=sys.executable, args=[os.path.join(ROOT, "snackbox_mcp.py")], env=env)
-    async with stdio_client(params) as (r, w):
+    errlog = sys.stderr if os.environ.get("SNACKBOX_VERBOSE") else open(os.devnull, "w")
+    async with stdio_client(params, errlog=errlog) as (r, w):
         async with ClientSession(r, w) as s:
             await s.initialize()
             res = await s.call_tool(name, args)
