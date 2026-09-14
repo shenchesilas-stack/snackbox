@@ -38,9 +38,10 @@ SCENE = {
             "pale-yellow wafer cone (a plain sugar cone, smooth surface, not waffle-grid), the base of the cone wrapped in a "
             "crumpled square of white paper; the cone stands upright in a small plain metal cone holder on the wood; the scoop "
             "shows scoop marks and has just begun to melt, one drip starting down the rim. Details: ",
-    "cup": "A tall clear plastic bubble-tea cup on the wood, filled with warm milk-brown tea, a layer of small black tapioca "
-           "pearls settled at the bottom, the top sealed with a thin plastic film that has been punched through by a fat straw "
-           "standing at a slight angle; faint steam and condensation on the outside of the cup; no text, no logo. Details: ",
+    "cup": "A tall clear plastic bubble-tea cup on the wood, HOT: filled with warm milk-brown tea, NO ice cubes, NO condensation "
+           "droplets, the outside of the cup dry; a thin layer of SMALL black tapioca pearls (pea-sized, not large) settled at the bottom; "
+           "the top sealed with a thin plastic film punched through by a fat straw standing at a slight angle; a soft wisp of steam "
+           "rising from the straw hole, warm autumn light; no text, no logo. Details: ",
     "bar": "An 85% dark chocolate bar, thin and wide, divided into small rectangles, its paper sleeve (printed with a "
            "simple illustration of cocoa beans and a cocoa plant, NO letters or numbers) pulled halfway off the short end and the thin SILVER foil (not gold) folded back with crinkles catching the light. One rectangle has "
            "been snapped off and lies beside the bar, snap edge toward the camera showing a fine dense grain, "
